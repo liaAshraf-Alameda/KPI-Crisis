@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>KPI Crisis Room: The Missing Consent Forms</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+	<style>
+		/* Animated gradient background */
+		body {
+			background: linear-gradient(-45deg, #ffcccc, #ffe680, #ccffcc, #cce6ff);
+			background-size: 400% 400%;
+			animation: gradientShift 15s ease infinite;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			color: #333;
+			padding: 20px;
+			margin: 0;
+		}
+
+		@keyframes gradientShift {
+			0% {background-position: 0% 50%;}
+			50% {background-position: 100% 50%;}
+			100% {background-position: 0% 50%;}
+		}
+
+		#story {
+			max-width: 900px;
+			margin: 0 auto;
+			background: white;
+			border-radius: 12px;
+			padding: 30px;
+			box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+		}
+
+		.passage { line-height: 1.8; display: none; }
+		.passage.active { display: block; animation: fadeIn 0.3s ease; }
+
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		h1, h2 {
+			color: #d63031;
+			border-bottom: 3px solid #d63031;
+			padding-bottom: 10px;
+		}
+
+		h3 { color: #0984e3; margin-top: 20px; }
+
+		/* Team info section */
+		.team-info {
+			background: linear-gradient(135deg, #667eea, #764ba2);
+			color: white;
+			padding: 20px;
+			border-radius: 8px;
+			margin-bottom: 20px;
+		}
+
+		.team-info h3 {
+			color: white;
+			margin-top: 0;
+			border: none;
+		}
+
+		.team-details {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 15px;
+			margin-top: 10px;
+		}
+
+		.team-detail-item {
+			background: rgba(255,255,255,0.2);
+			padding: 10px;
+			border-radius: 6px;
+		}
+
+		.team-detail-label {
+			font-size: 12px;
+			font-weight: bold;
+			text-transform: uppercase;
+			opacity: 0.8;
+		}
+
+		.team-detail-value {
+			font-size: 18px;
+			font-weight: bold;
+			margin-top: 5px;
+		}
+
+		#countdown {
+			font-size: 24px;
+			font-weight: bold;
+			color: #d63031;
+			margin: 15px 0;
+			padding: 15px;
+			background: #fff5f5;
+			border-left: 4px solid #d63031;
+			border-radius: 4px;
+			text-align: center;
+		}
+
+		#countdown.alarm {
+			animation: alarmPulse 0.5s infinite;
+		}
+
+		@keyframes alarmPulse {
+			0%, 100% { 
+				background: #fff5f5;
+				transform: scale(1);
+			}
+			50% { 
+				background: #ff9999;
+				transform: scale(1.05);
+			}
+		}
+
+		.chart-container {
+			position: relative;
+			width: 100%;
+			max-width: 600px;
+			margin: 20px auto;
+			background: #f8f9fa;
+			padding: 15px;
+			border-radius: 8px;
+		}
+
+		.progress-container {
+			width: 100%;
+			height: 30px;
+			background-color: #e0e0e0;
+			border-radius: 15px;
+			overflow: hidden;
+			margin: 15px 0;
+		}
+
+		.progress-bar {
+			height: 100%;
+			background: linear-gradient(90deg, #00b894, #0984e3);
+			width: 0%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-weight: bold;
+			transition: width 0.3s ease;
+		}
+
+		form {
+			margin: 20px 0;
+			padding: 15px;
+			background: #f8f9fa;
+			border-radius: 8px;
+		}
+
+		label {
+			display: block;
+			margin: 12px 0;
+			padding: 10px;
+			background: white;
+			border: 2px solid #ddd;
+			border-radius: 6px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+
+		label:hover {
+			background: #e8f5e9;
+			border-color: #00b894;
+		}
+
+		button {
+			background: linear-gradient(135deg, #667eea, #764ba2);
+			color: white;
+			border: none;
+			padding: 12px 30px;
+			font-size: 16px;
+			border-radius: 6px;
+			cursor: pointer;
+			margin: 10px 5px;
+			transition: all 0.3s ease;
+		}
+
+		button:hover:not(:disabled) {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+		}
+
+		button:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		.results-box {
+			background: #f0f7ff;
+			border-left: 4px solid #0984e3;
+			padding: 15px;
+			margin: 15px 0;
+			border-radius: 4px;
+		}
+
+		.cause-block {
+			margin: 10px 0;
+			padding: 12px;
+			border-radius: 6px;
+			background: white;
+			border-left: 4px solid #667eea;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+
+		.score {
+			font-weight: bold;
+			font-size: 18px;
+			color: #d63031;
+			margin-top: 15px;
+			padding: 10px;
+			background: #fff5f5;
+			border-radius: 4px;
+		}
+
+		.tool-card {
+			background: white;
+			border: 2px solid #ddd;
+			padding: 15px;
+			margin: 10px 0;
+			border-radius: 8px;
+			transition: all 0.3s ease;
+		}
+
+		.tool-card:hover {
+			border-color: #667eea;
+			box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+		}
+
+		.data-card {
+			background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+			border: 2px solid #667eea;
+			padding: 20px;
+			margin: 15px 0;
+			border-radius: 8px;
+			box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+		}
+
+		.success-message {
+			background: #d4edda;
+			border: 2px solid #28a745;
+			color: #155724;
+			padding: 15px;
+			border-radius: 6px;
+			margin: 15px 0;
+		}
+
+		.failure-message {
+			background: #fff3cd;
+			border: 2px solid #ffc107;
+			color: #856404;
+			padding: 15px;
+			border-radius: 6px;
+			margin: 15px 0;
+		}
+
+		.nav-links {
+			margin-top: 20px;
+			padding-top: 20px;
+			border-top: 2px solid #ddd;
+		}
+
+		.emoji { font-size: 1.5em; margin-right: 8px; }
+
+		/* Team registration form */
+		.registration-form {
+			background: #f8f9fa;
+			padding: 20px;
+			border-radius: 8px;
+			margin: 20px 0;
+		}
+
+		.form-group {
+			margin: 15px 0;
+		}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 8px;
+			font-weight: bold;
+			color: #333;
+			background: none;
+			border: none;
+			padding: 0;
+		}
+
+		.form-group input, .form-group select {
+			width: 100%;
+			padding: 10px;
+			border: 2px solid #ddd;
+			border-radius: 6px;
+			font-size: 14px;
+			box-sizing: border-box;
+		}
+
+		.form-group input:focus, .form-group select:focus {
+			outline: none;
+			border-color: #667eea;
+			background: #f0f7ff;
+		}
+
+		.time-info {
+			background: #e3f2fd;
+			border-left: 4px solid #2196F3;
+			padding: 12px;
+			margin: 10px 0;
+			border-radius: 4px;
+			font-size: 14px;
+		}
+
+		/* Team members list */
+		.team-members-list {
+			background: #f0f7ff;
+			border: 2px solid #667eea;
+			padding: 15px;
+			border-radius: 8px;
+			margin: 15px 0;
+		}
+
+		.team-members-list h4 {
+			color: #667eea;
+			margin-top: 0;
+		}
+
+		.member-item {
+			background: white;
+			padding: 10px;
+			margin: 8px 0;
+			border-radius: 4px;
+			border-left: 3px solid #00b894;
+		}
+
+		.member-item strong {
+			color: #667eea;
+		}
+
+		/* Leaderboard */
+		.leaderboard {
+			margin-top: 20px;
+			border: 2px solid #ddd;
+			border-radius: 8px;
+			padding: 12px;
+			background: #fff;
+		}
+
+		.leaderboard h4 {
+			margin: 0 0 10px 0;
+			color: #333;
+		}
+
+		.leaderboard table {
+			width: 100%;
+			border-collapse: collapse;
+		}
+
+		.leaderboard th, .leaderboard td {
+			padding: 8px;
+			text-align: left;
+			border-bottom: 1px solid #eee;
+			font-size: 13px;
+		}
+
+		.leaderboard .small { font-size: 12px; color: #666; }
+
+		/* Action selection hint */
+		#actionSelectionHint {
+			margin: 10px 0;
+			font-weight: bold;
+			color: #333;
+		}
+	</style>
+</head>
+<body>
+
+<div id="story">
+	<!-- All passages will be inserted here by JavaScript -->
+</div>
+
+<audio id="alarmSound" preload="auto">
+	<source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBg==" type="audio/wav">
+</audio>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+<script>
+// Game state
+var gameState = {
+	teamName: '',
+	teamMembers: [],
+	score: 0,
+	weightedScore: 0,
+	causeWeights: {},
+	weightedMax: 0,
+	tool: null,
+	actionsSelected: [],
+	actionsWeighted: 0,
+	actionsMaxPossible: 0,
+	actionsFactor: 0.5,
+	finalKPI: null,
+	currentPage: 'Registration'
+};
+
+var SCORE_MAX = 30;
+
+var weightRatings = {
+  "Staff shortage": 10,
+  "Staff not trained": 9,
+  "Consent form moved in EMR": 8,
+  "New physicians joined": 7,
+  "Poor supervision": 6,
+  "Policy update not communicated": 5,
+  "High patient turnover": 4,
+  "Overloaded EMR system": 3,
+  "Language barriers with patients": 2,
+  "Medication shortage": 0,
+  "Equipment malfunction": 0
+};
+
+var sortedWeights = Object.values(weightRatings).slice().sort(function(a,b){return b-a;});
+var weightedMaxPossible = sortedWeights[0] + (sortedWeights[1] || 0) + (sortedWeights[2] || 0);
+
+var toolImpacts = {
+	'FOCUS-PDCA': 1.0,
+	'DMAIC': 0.9,
+	'Lean': 0.8
+};
+
+var KPI_BASELINE = 84;
+var KPI_IDEAL = 96;
+
+var timeLimits = {
+	RootCauseHunt: 60,
+	DataMarketplace: 300,
+	ActionPlan: 300
+};
+
+// Actions for each tool (weights internal only)
+var toolActions = {
+	'FOCUS-PDCA': [
+		{ id: 'rapidTraining', name: 'Run a rapid training session', desc: 'Short, focused training (15–20 minutes) demonstrating the consent workflow — immediate boost in staff knowledge.', weight: 9 },
+		{ id: 'pilotChecklist', name: 'Pilot a new consent checklist', desc: 'Introduce a concise consent checklist and pilot it on one unit to test workflow improvements.', weight: 8 },
+		{ id: 'dailyHuddle', name: 'Daily huddle for feedback', desc: 'Hold a short daily huddle to capture feedback and remove blockers quickly.', weight: 7 },
+		{ id: 'miniAudit', name: 'Mini‑audit of 10 charts per day', desc: 'Perform rapid audits of 10 charts daily and provide immediate feedback to staff to monitor compliance.', weight: 8 }
+	],
+	'Lean': [
+		{ id: 'removeRedundantClicks', name: 'Remove redundant EMR clicks', desc: 'Work with IT to remove unnecessary clicks and defaults so documentation is faster and less frustrating.', weight: 9 },
+		{ id: 'standardizeWorkflow', name: 'Standardize consent workflow steps', desc: 'Create a simple, standardized step sequence for consent documentation to reduce variation across departments.', weight: 8 },
+		{ id: 'reassignTasks', name: 'Reassign tasks to balance workload', desc: 'Adjust role assignments and task distribution to reduce bottlenecks from staff shortages.', weight: 7 },
+		{ id: 'visualReminders', name: 'Visual reminders at patient intake', desc: 'Place clear visual cues and checklists at intake points to prompt staff to obtain consent.', weight: 6 }
+	],
+	'DMAIC': [
+		{ id: 'rootCauseData', name: 'Conduct root cause analysis with data', desc: 'Use data to run a focused root cause analysis and identify hidden drivers of non‑compliance.', weight: 9 },
+		{ id: 'retrainFromAudits', name: 'Retrain staff based on audit findings', desc: 'Deliver targeted retraining sessions addressing specific gaps discovered in audits.', weight: 8 },
+		{ id: 'controlChart', name: 'Introduce control chart monitoring', desc: 'Implement SPC/control charts to monitor compliance trends and detect shifts early.', weight: 8 },
+		{ id: 'correctivePlan', name: 'Develop corrective action plan with metrics', desc: 'Create a corrective action plan including metrics, owners and timelines to ensure accountability.', weight: 7 }
+	]
+};
+
+// Passages (unchanged except ActionPlan includes hint)
+var passages = {
+	'Registration': `
+		<h2><span class="emoji">👥</span>Team Registration</h2>
+		<p>Welcome to the KPI Crisis Room! Before you begin, please register your team:</p>
+		
+		<div class="registration-form">
+			<div class="form-group">
+				<label for="teamName"><strong>Team Name:</strong></label>
+				<input type="text" id="teamName" placeholder="Enter your team name (e.g., Emergency Department, ICU, Compliance Team)" required>
+			</div>
+
+			<div class="form-group">
+				<label for="memberCount"><strong>Number of Team Members:</strong></label>
+				<select id="memberCount" onchange="updateMemberFields()">
+					<option value="">-- Select number --</option>
+					<option value="1">1 Member</option>
+					<option value="2">2 Members</option>
+					<option value="3">3 Members</option>
+					<option value="4">4 Members</option>
+					<option value="5">5 Members</option>
+				</select>
+			</div>
+
+			<div id="memberFields"></div>
+
+			<button onclick="registerTeam()">Start Mission →</button>
+		</div>
+
+		<div class="results-box">
+			<p><strong>⏱️ Time per round:</strong></p>
+			<ul>
+				<li>Root Cause Hunt: 1 minute</li>
+				<li>Data Marketplace Review: 5 minutes</li>
+				<li>Action Plan Development: 5 minutes</li>
+			</ul>
+		</div>
+	`,
+	'Start': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize">-</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="team-members-list" id="teamMembersList"></div>
+
+		<h2><span class="emoji">🚨</span>KPI Crisis Room: The Missing Consent Forms</h2>
+		
+		<p><strong>Target KPI:</strong> ≥95% informed consent documentation.</p>
+		<p><strong>Current Status:</strong> CRITICAL ⚠️</p>
+		<p>Performance is dropping rapidly. Patient safety and accreditation are at immediate risk.</p>
+		
+		<div class="chart-container">
+			<canvas id="kpiChart"></canvas>
+		</div>
+
+		<div class="results-box">
+			<h3>The Situation</h3>
+			<p>Over the past 4 months, consent documentation has declined from 97% to 84%. This places the hospital out of compliance and risks:</p>
+			<ul>
+				<li>❌ Accreditation loss</li>
+				<li>❌ Legal liability</li>
+				<li>❌ Patient safety concerns</li>
+				<li>❌ Regulatory penalties</li>
+			</ul>
+		</div>
+
+		<h3>Your Mission</h3>
+		<p>Investigate root causes, analyze data, select the right improvement methodology, and restore compliance to ≥95% before accreditation review fails.</p>
+
+		<div class="nav-links">
+			<button onclick="goToPage('RootCauseHunt')">Yes — Let's Fix This!</button>
+			<button onclick="openLeaderboardWindow()">Open Leaderboard</button>
+			<button onclick="goToPage('GameOver')">No — We're Not Ready</button>
+		</div>
+	`,
+	'RootCauseHunt': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName2">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize2">-</div>
+				</div>
+			</div>
+		</div>
+
+		<h2><span class="emoji">🕵️</span>ROUND 1: ROOT CAUSE HUNT</h2>
+		
+		<div class="time-info">
+			<strong>⏱️ Time Limit:</strong> 1 minute (60 seconds)
+		</div>
+
+		<p>Choose the <strong>3 most likely causes</strong> of the compliance failure:</p>
+		<div id="countdown"></div>
+
+		<form id="causeForm">
+			<label>
+				<input type="checkbox" name="cause" value="Staff shortage">
+				<strong>Staff Shortage</strong> — High ratio of open shifts; multiple appointments rescheduled
+			</label>
+			<label>
+				<input type="checkbox" name="cause" value="New physicians joined">
+				<strong>New Physicians Joined</strong> — New hires unfamiliar with local workflows; higher error rates
+			</label>
+			<label>
+				<input type="checkbox" name="cause" value="Consent form moved in EMR">
+				<strong>Consent Form Moved in EMR</strong> — Consent workflow changed location in the EMR system
+			</label>
+			<label>
+				<input type="checkbox" name="cause" value="Staff not trained">
+				<strong>Staff Not Trained</strong> — Missing or incomplete training logs; staff report uncertainty
+			</label>
+			<label>
+				<input type="checkbox" name="cause" value="Medication shortage">
+				<strong>Medication Shortage</strong> — Pharmacy alerts for low stock; substitution rates increased
+			</label>
+			<label>
+				<input type="checkbox" name="cause" value="Equipment malfunction">
+				<strong>Equipment Malfunction</strong> — Increased maintenance tickets; several downtime incidents
+			</label>
+			<label>
+				<input type="checkbox" name="cause" value="Poor supervision">
+				<strong>Poor Supervision</strong> — Inconsistent oversight and spot-checking of documentation.
+			</label>
+			<label>
+				<input type="checkbox" name="cause" value="Policy update not communicated">
+				<strong>Policy Update Not Communicated</strong> — Changes not pushed to frontline staff.
+			</label>
+			<label>
+				<input type="checkbox" name="cause" value="High patient turnover">
+				<strong>High Patient Turnover</strong> — Busy shifts reduce documentation time.
+			</label>
+			<label>
+				<input type="checkbox" name="cause" value="Overloaded EMR system">
+				<strong>Overloaded EMR System</strong> — Slow or unresponsive EMR causes skipped steps.
+			</label>
+			<label>
+				<input type="checkbox" name="cause" value="Language barriers with patients">
+				<strong>Language Barriers With Patients</strong> — Consent conversations require interpreters, causing delays.
+			</label>
+		</form>
+
+		<button id="submitCausesBtn" onclick="submitCauses()">Submit Choices</button>
+		<div id="results" style="display:none;"></div>
+		<div id="continueBtn" style="display:none;" class="nav-links">
+			<button onclick="goToPage('DataMarketplace')">Continue to Data Marketplace →</button>
+		</div>
+	`,
+	'DataMarketplace': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName3">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize3">-</div>
+				</div>
+			</div>
+		</div>
+
+		<h2><span class="emoji">🛒</span>ROUND 2: DATA MARKETPLACE</h2>
+		
+		<div class="time-info">
+			<strong>⏱️ Time Limit:</strong> 5 minutes (300 seconds)
+		</div>
+
+		<p>You identified potential causes. Now unlock detailed data insights based on your investigation score:</p>
+		<div id="countdown"></div>
+		<div id="scoreDisplay"></div>
+		<div class="progress-container">
+			<div class="progress-bar" id="progressBar">0%</div>
+		</div>
+		<h3>Available Data Reports</h3>
+		<div id="dataLinks"></div>
+		<div class="nav-links">
+			<button onclick="goToPage('ChooseTool')">Proceed to Tool Selection →</button>
+		</div>
+	`,
+	'DataAudit': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName4">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize4">-</div>
+				</div>
+			</div>
+		</div>
+
+		<h2><span class="emoji">📊</span>Audit Results</h2>
+		<div class="data-card">
+			<h3>Finding: Missing Consent Documentation</h3>
+			<p><strong>16% of cases</strong> lack proper informed consent documentation.</p>
+			<p><strong>Root Issue:</strong> Staff cannot locate the consent form in the new EMR location.</p>
+			<p><strong>Impact:</strong> Direct correlation between EMR update and documentation gap.</p>
+			<p><strong>Recommendation:</strong> Update job aids, create EMR quick links, and reinforce staff training.</p>
+		</div>
+		<div class="nav-links">
+			<button onclick="goToPage('DataMarketplace')">← Back to Marketplace</button>
+		</div>
+	`,
+	'DataPhysicians': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName5">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize5">-</div>
+				</div>
+			</div>
+		</div>
+
+		<h2><span class="emoji">👩‍⚕️</span>Physician Profile Analysis</h2>
+		<div class="data-card">
+			<h3>Finding: New Physician Onboarding Gap</h3>
+			<p><strong>4 new physicians</strong> joined in the past 3 months.</p>
+			<p><strong>Issue:</strong> Incomplete orientation; unfamiliar with consent procedures.</p>
+			<p><strong>Error Rate:</strong> New hires show 3x higher documentation gaps than experienced staff.</p>
+			<p><strong>Recommendation:</strong> Implement structured onboarding program with hands-on consent workflow training.</p>
+		</div>
+		<div class="nav-links">
+			<button onclick="goToPage('DataMarketplace')">← Back to Marketplace</button>
+		</div>
+	`,
+	'DataEMR': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName6">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize6">-</div>
+				</div>
+			</div>
+		</div>
+
+		<h2><span class="emoji">💻</span>EMR Change Report</h2>
+		<div class="data-card">
+			<h3>Finding: System Change Impact</h3>
+			<p><strong>Change Event:</strong> Consent form location moved 2 months ago.</p>
+			<p><strong>Timeline Correlation:</strong> Compliance dropped from 95% to 90% immediately after.</p>
+			<p><strong>Staff Feedback:</strong> "Can't find the consent form anymore," "The new location is unintuitive."</p>
+			<p><strong>Recommendation:</strong> Create quick links, update EMR navigation, and provide visual job aids.</p>
+		</div>
+		<div class="nav-links">
+			<button onclick="goToPage('DataMarketplace')">← Back to Marketplace</button>
+		</div>
+	`,
+	'DataFeedback': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName7">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize7">-</div>
+				</div>
+			</div>
+		</div>
+
+		<h2><span class="emoji">🗣️</span>Staff Feedback Summary</h2>
+		<div class="data-card">
+			<h3>Finding: Training & Process Gaps</h3>
+			<p><strong>Common Complaints:</strong></p>
+			<ul>
+				<li>Unclear consent procedures</li>
+				<li>Difficulty locating forms in new EMR</li>
+				<li>No formal training on process changes</li>
+				<li>Uncertainty on when/how to obtain consent</li>
+			</ul>
+			<p><strong>Recommendation:</strong> Implement change management protocol with staff communication and training.</p>
+		</div>
+		<div class="nav-links">
+			<button onclick="goToPage('DataMarketplace')">← Back to Marketplace</button>
+		</div>
+	`,
+	'ChooseTool': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName8">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize8">-</div>
+				</div>
+			</div>
+		</div>
+
+		<h2><span class="emoji">🛠️</span>ROUND 3: CHOOSE YOUR IMPROVEMENT TOOL</h2>
+		<p>You've gathered evidence. Now select the improvement methodology that best addresses the root causes:</p>
+		<form id="toolForm">
+			<div class="tool-card">
+				<label>
+					<input type="radio" name="tool" value="FOCUS-PDCA">
+					<strong>🔄 FOCUS–PDCA</strong><br>
+					<small>Rapid cycle improvement methodology. Best for quick wins and iterative testing. (Highest impact here)</small>
+				</label>
+			</div>
+			<div class="tool-card">
+				<label>
+					<input type="radio" name="tool" value="Lean">
+					<strong>⚡ Lean</strong><br>
+					<small>Eliminate waste and streamline processes. Best for process optimization and efficiency.</small>
+				</label>
+			</div>
+			<div class="tool-card">
+				<label>
+					<input type="radio" name="tool" value="DMAIC">
+					<strong>📊 DMAIC</strong><br>
+					<small>Data-driven problem solving. Best for systematic improvements with measurement.</small>
+				</label>
+			</div>
+		</form>
+		<button id="submitToolBtn" onclick="submitTool()">Lock In Tool</button>
+		<div id="toolContinueBtn" style="display:none;" class="nav-links">
+			<button onclick="goToPage('ActionPlan')">Proceed to Action Plan →</button>
+		</div>
+	`,
+	'ActionPlan': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName9">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize9">-</div>
+				</div>
+			</div>
+		</div>
+
+		<h2><span class="emoji">📋</span>ACTION PLAN: Your Improvement Strategy</h2>
+		
+		<div class="time-info">
+			<strong>⏱️ Time Limit:</strong> 5 minutes (300 seconds)
+		</div>
+
+		<div id="countdown"></div>
+
+		<div id="actionPlanContent"></div>
+
+		<h3>Choose 2 Actions to Implement (exactly two required)</h3>
+		<div id="actionSelectionHint">Selected 0 of 2 actions</div>
+		<form id="actionsForm">
+			<div id="actionsList"></div>
+			<div style="margin-top:12px;">
+				<button type="button" id="lockActionsBtn" onclick="submitActions()" disabled>Lock Selected Actions</button>
+				<button type="button" id="executePlanBtn" onclick="goToPage('FinalRound')" disabled>Execute Plan & See Results →</button>
+			</div>
+		</form>
+
+		<div class="nav-links">
+			<button onclick="goToPage('Start')">← Back to Start</button>
+		</div>
+	`,
+	'FinalRound': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName10">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize10">-</div>
+				</div>
+			</div>
+		</div>
+
+		<h2><span class="emoji">📈</span>FINAL ROUND: KPI RECOVERY</h2>
+		<p>After implementing your action plan and improvement strategies:</p>
+		<div class="chart-container">
+			<canvas id="finalChart"></canvas>
+		</div>
+
+		<!-- dynamic result message will be injected here by JS -->
+		<div id="finalResultMessage"></div>
+
+		<div id="finalSummary"></div>
+
+		<!-- Leaderboard goes here -->
+		<div id="leaderboardContainer" class="leaderboard"></div>
+
+		<div class="nav-links">
+			<button onclick="resetGame()">Play Again</button>
+		</div>
+	`,
+	'GameOver': `
+		<div class="team-info">
+			<h3><span class="emoji">👥</span>Team Information</h3>
+			<div class="team-details">
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Name</div>
+					<div class="team-detail-value" id="displayTeamName11">-</div>
+				</div>
+				<div class="team-detail-item">
+					<div class="team-detail-label">Team Size</div>
+					<div class="team-detail-value" id="displayTeamSize11">-</div>
+				</div>
+			</div>
+		</div>
+
+		<h2><span class="emoji">⏳</span>Game Over</h2>
+		<p>Time expired or mission abandoned.</p>
+		<p><strong>Outcome:</strong> The compliance crisis was not addressed in time. Accreditation review failed.</p>
+		<div class="results-box">
+			<h3>What Went Wrong?</h3>
+			<p>Without swift investigation and intervention, KPI performance continued to decline, leading to accreditation loss and regulatory penalties.</p>
+		</div>
+		<p><strong>Key Lesson:</strong> KPI management requires rapid assessment, data-driven decision-making, and swift corrective action.</p>
+
+		<!-- Leaderboard goes here for game overs too -->
+		<div id="leaderboardContainerGameOver" class="leaderboard"></div>
+
+		<div class="nav-links">
+			<button onclick="resetGame()">Try Again</button>
+		</div>
+	`
+};
+
+// Update member fields dynamically
+function updateMemberFields() {
+	var count = $('#memberCount').val();
+	var html = '';
+
+	if (count) {
+		html += '<h4>Team Members:</h4>';
+		for (var i = 1; i <= count; i++) {
+			html += '<div class="form-group">';
+			html += '<label for="member' + i + '"><strong>Member ' + i + ' Name:</strong></label>';
+			html += '<input type="text" id="member' + i + '" placeholder="Enter member name" required>';
+			html += '</div>';
+		}
+	}
+
+	$('#memberFields').html(html);
+}
+
+// Register team
+function registerTeam() {
+	var teamName = $('#teamName').val().trim();
+	var memberCount = $('#memberCount').val();
+
+	if (!teamName) {
+		alert('Please enter your team name');
+		return;
+	}
+	if (!memberCount) {
+		alert('Please select number of team members');
+		return;
+	}
+
+	gameState.teamName = teamName;
+	gameState.teamMembers = [];
+
+	for (var i = 1; i <= memberCount; i++) {
+		var memberName = $('#member' + i).val().trim();
+		if (!memberName) {
+			alert('Please enter name for Member ' + i);
+			return;
+		}
+		gameState.teamMembers.push(memberName);
+	}
+
+	goToPage('Start');
+}
+
+// Navigation function
+function goToPage(pageName) {
+	gameState.currentPage = pageName;
+	$('#story').html('<div class="passage active">' + passages[pageName] + '</div>');
+
+	// Update team info displays
+	$('#displayTeamName, #displayTeamName2, #displayTeamName3, #displayTeamName4, #displayTeamName5, #displayTeamName6, #displayTeamName7, #displayTeamName8, #displayTeamName9, #displayTeamName10, #displayTeamName11').text(gameState.teamName);
+	$('#displayTeamSize, #displayTeamSize2, #displayTeamSize3, #displayTeamSize4, #displayTeamSize5, #displayTeamSize6, #displayTeamSize7, #displayTeamSize8, #displayTeamSize9, #displayTeamSize10, #displayTeamSize11').text(gameState.teamMembers.length + ' members');
+
+	// Display team members list on Start page
+	if (pageName === 'Start') {
+		var membersList = '<h4>Team Members:</h4>';
+		gameState.teamMembers.forEach(function(member, index) {
+			membersList += '<div class="member-item"><strong>Member ' + (index + 1) + ':</strong> ' + member + '</div>';
+		});
+		$('#teamMembersList').html(membersList);
+		
+		setTimeout(drawKPIChart, 300);
+	} else if (pageName === 'RootCauseHunt') {
+		startCountdown(timeLimits.RootCauseHunt, function() {
+			saveScoreToLeaderboard(false);
+			goToPage('GameOver');
+		});
+	} else if (pageName === 'DataMarketplace') {
+		setTimeout(function() {
+			updateDataMarketplace();
+			startCountdown(timeLimits.DataMarketplace, function() {
+				alert('Time expired! Moving to Tool Selection.');
+				goToPage('ChooseTool');
+			});
+		}, 300);
+	} else if (pageName === 'ActionPlan') {
+		setTimeout(function() {
+			generateActionPlan();
+			startCountdown(timeLimits.ActionPlan, function() {
+				goToPage('FinalRound');
+			});
+		}, 200);
+	} else if (pageName === 'FinalRound') {
+		computeFinalKPI();
+		setTimeout(drawFinalChart, 300);
+		generateFinalSummary();
+		saveScoreToLeaderboard(gameState.finalKPI >= 95);
+		renderLeaderboard('leaderboardContainer');
+	} else if (pageName === 'GameOver') {
+		renderLeaderboard('leaderboardContainerGameOver');
+	}
+}
+
+// Countdown timer
+var currentTimer = null;
+function startCountdown(duration, onExpire) {
+	if (currentTimer) clearInterval(currentTimer);
+
+	var timeLeft = duration;
+	var countdownEl = document.getElementById('countdown');
+	if (!countdownEl) return;
+
+	currentTimer = setInterval(function() {
+		var minutes = Math.floor(timeLeft / 60);
+		var seconds = timeLeft % 60;
+		var padSeconds = seconds < 10 ? '0' + seconds : seconds;
+		countdownEl.textContent = '⏳ Time remaining: ' + minutes + 'm ' + padSeconds + 's';
+
+		if (timeLeft <= 10 && timeLeft > 0) {
+			countdownEl.classList.add('alarm');
+			playAlarmSound();
+		} else {
+			countdownEl.classList.remove('alarm');
+		}
+
+		timeLeft--;
+		if (timeLeft < 0) {
+			clearInterval(currentTimer);
+			countdownEl.classList.remove('alarm');
+			if (onExpire) onExpire();
+		}
+	}, 1000);
+}
+
+function playAlarmSound() {
+	try {
+		var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+		var oscillator = audioContext.createOscillator();
+		var gainNode = audioContext.createGain();
+
+		oscillator.connect(gainNode);
+		gainNode.connect(audioContext.destination);
+
+		oscillator.frequency.value = 800;
+		oscillator.type = 'sine';
+
+		gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+		gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+
+		oscillator.start(audioContext.currentTime);
+		oscillator.stop(audioContext.currentTime + 0.1);
+	} catch(e) {
+		var audio = document.getElementById('alarmSound');
+		if (audio) audio.play().catch(function() {});
+	}
+}
+
+// Submit causes (unchanged)
+function submitCauses() {
+	var selected = [];
+	$('#causeForm input[name="cause"]:checked').each(function() {
+		selected.push($(this).val());
+	});
+
+	if (selected.length !== 3) {
+		alert('Please select exactly 3 causes before continuing.');
+		return;
+	}
+
+	var weightedScore = 0;
+	var causeWeights = {};
+	var totalWeight = 0;
+	selected.forEach(function(choice) {
+		var w = weightRatings[choice] || 0;
+		causeWeights[choice] = w;
+		weightedScore += w;
+		totalWeight += w;
+	});
+
+	var normalizedScore = 0;
+	if (weightedMaxPossible > 0) {
+		normalizedScore = Math.round((weightedScore / weightedMaxPossible) * SCORE_MAX);
+	} else {
+		normalizedScore = 0;
+	}
+
+	gameState.score = normalizedScore;
+	gameState.weightedScore = weightedScore;
+	gameState.weightedMax = weightedMaxPossible;
+	gameState.causes = selected;
+	gameState.causeWeights = causeWeights;
+
+	var causeData = {
+		'Staff shortage': 'Observed: High ratio of open shifts; multiple appointments rescheduled.',
+		'New physicians joined': 'Observed: New hires unfamiliar with local workflows; higher error rates during onboarding.',
+		'Consent form moved in EMR': 'Observed: Consent workflow changed location in the EMR; staff report difficulty finding the form.',
+		'Staff not trained': 'Observed: Missing training logs; staff report uncertainty on procedures.',
+		'Medication shortage': 'Observed: Pharmacy alerts for low stock; substitution rates increased.',
+		'Equipment malfunction': 'Observed: Increased maintenance tickets; several downtime incidents.',
+		'Poor supervision': 'Observed: Inconsistent oversight and documentation checks.',
+		'Policy update not communicated': 'Observed: Policy changes not communicated to frontline staff.',
+		'High patient turnover': 'Observed: Busy shifts reduce time available for documentation.',
+		'Overloaded EMR system': 'Observed: EMR performance issues during peak hours.',
+		'Language barriers with patients': 'Observed: Interpreters needed frequently; process delays occur.'
+	};
+
+	var resultsHtml = '<h3>Your Selections</h3>';
+	selected.forEach(function(choice) {
+		resultsHtml += '<div class="cause-block"><strong>' + choice + '</strong><div>' + causeData[choice] + '</div>';
+		resultsHtml += '<div style="margin-top:8px;"><em>Weight:</em> ' + (causeWeights[choice] || 0) + ' pts';
+		if (totalWeight > 0) {
+			var pct = Math.round((causeWeights[choice] / totalWeight) * 100);
+			resultsHtml += ' &nbsp;(<strong>' + pct + '%</strong> of selected impact)';
+		}
+		resultsHtml += '</div></div>';
+	});
+
+	resultsHtml += '<div class="score">Score: ' + normalizedScore + ' / ' + SCORE_MAX + ' (weighted: ' + weightedScore + ' / ' + weightedMaxPossible + ')</div>';
+
+	$('#results').html(resultsHtml).show();
+	$('#continueBtn').show();
+	$('#causeForm').prop('disabled', true);
+	
+	if (currentTimer) clearInterval(currentTimer);
+}
+
+// Tool selection (unchanged)
+function submitTool() {
+	var selected = $('#toolForm input[name="tool"]:checked').val();
+	if (!selected) {
+		alert('Please choose a tool before continuing.');
+		return;
+	}
+	gameState.tool = selected;
+	$('#toolContinueBtn').show();
+	if (currentTimer) clearInterval(currentTimer);
+}
+
+// Data Marketplace update (unchanged)
+function updateDataMarketplace() {
+	var scoreDisplay = '<div class="results-box"><h3>Your Investigation Score: ' + gameState.score + ' / ' + SCORE_MAX + '</h3>';
+	scoreDisplay += '<p><small>Weighted score: ' + (gameState.weightedScore || 0) + ' / ' + weightedMaxPossible + '</small></p>';
+	if (gameState.score >= SCORE_MAX) scoreDisplay += '<p>🏆 Excellent investigation! All premium data unlocked.</p>';
+	else if (gameState.score >= Math.round(SCORE_MAX * 0.6)) scoreDisplay += '<p>✅ Good investigation. Most data available.</p>';
+	else scoreDisplay += '<p>⚠️ Limited data available.</p>';
+	scoreDisplay += '</div>';
+	$('#scoreDisplay').html(scoreDisplay);
+
+	var dataLinks = '<p>Click to view detailed analysis reports:</p>';
+	if (gameState.score >= 10) dataLinks += '<button onclick="goToPage(\'DataAudit\')">📊 Audit Results</button>';
+	else dataLinks += '<p><em>Locked: Score 10+ to unlock</em></p>';
+	if (gameState.score >= 15) dataLinks += '<button onclick="goToPage(\'DataPhysicians\')">👩‍⚕️ Physician Profile</button>';
+	else dataLinks += '<p><em>Locked: Score 15+ to unlock</em></p>';
+	if (gameState.score >= 20) dataLinks += '<button onclick="goToPage(\'DataEMR\')">💻 EMR Change Report</button>';
+	else dataLinks += '<p><em>Locked: Score 20+ to unlock</em></p>';
+	if (gameState.score >= 25) dataLinks += '<button onclick="goToPage(\'DataFeedback\')">🗣️ Staff Feedback</button>';
+	else dataLinks += '<p><em>Locked: Score 25+ to unlock</em></p>';
+	$('#dataLinks').html(dataLinks);
+
+	updateProgressBar(gameState.score, SCORE_MAX);
+}
+
+// Progress bar (unchanged)
+function updateProgressBar(score, maxScore) {
+	var percent = Math.min((score / maxScore) * 100, 100);
+	var bar = document.getElementById('progressBar');
+	if (bar) {
+		bar.style.width = percent + '%';
+		bar.textContent = Math.round(percent) + '%';
+		if (score < Math.round(maxScore * 0.5)) bar.style.background = 'linear-gradient(90deg, #e74c3c, #c0392b)';
+		else if (score < Math.round(maxScore * 0.85)) bar.style.background = 'linear-gradient(90deg, #f39c12, #e67e22)';
+		else bar.style.background = 'linear-gradient(90deg, #27ae60, #229954)';
+	}
+}
+
+// NEW: enforce two-selection helpers
+function enforceTwoSelection() {
+	var checked = $('#actionsCheckboxes input[name="action"]:checked');
+	var all = $('#actionsCheckboxes input[name="action"]');
+	if (checked.length >= 2) {
+		all.not(':checked').prop('disabled', true);
+		$('#lockActionsBtn').prop('disabled', false);
+	} else {
+		all.prop('disabled', false);
+		$('#lockActionsBtn').prop('disabled', true);
+	}
+}
+
+function updateActionSelectionHint() {
+	var count = $('#actionsCheckboxes input[name="action"]:checked').length;
+	$('#actionSelectionHint').text('Selected ' + count + ' of 2 actions' + (count === 2 ? ' — ready to lock' : ''));
+}
+
+// Action plan generation: hide weights in UI and attach selection logic
+function generateActionPlan() {
+	var tool = gameState.tool || 'FOCUS-PDCA';
+	var contributions = [];
+	var totalSelectedWeight = 0;
+	for (var c in gameState.causeWeights) totalSelectedWeight += gameState.causeWeights[c] || 0;
+	for (var c in gameState.causeWeights) {
+		var w = gameState.causeWeights[c] || 0;
+		var pct = totalSelectedWeight > 0 ? Math.round((w / totalSelectedWeight) * 100) : 0;
+		contributions.push({ cause: c, weight: w, pct: pct });
+	}
+	contributions.sort(function(a,b){return b.weight - a.weight;});
+	var analyzeText = 'Root cause contributions (selected causes): ';
+	analyzeText += contributions.map(function(x){ return x.cause + ' ' + x.pct + '%'; }).join(' • ');
+
+	var plans = {
+		'FOCUS-PDCA': {
+			title: '🔄 Rapid Cycle Improvement (FOCUS-PDCA)',
+			steps: [
+				'Find: Confirm EMR form location is the main barrier',
+				'Organize: Assemble team (IT, clinical staff, compliance)',
+				'Clarify: Root cause = EMR change without communication',
+				'Understand: 16% documentation gap linked to new form location',
+				'Select: Quick wins: Create job aid, add EMR quick link, email staff',
+				'Plan-Do-Check-Act: PDCA Cycle 1: Create quick reference card, distribute, monitor, adjust'
+			],
+			outcome: 'Rapid implementation with weekly monitoring.'
+		},
+		'Lean': {
+			title: '⚡ Lean Process Optimization',
+			steps: [
+				'Value Stream Map: Current consent documentation workflow',
+				'Identify Waste: Consent form hidden in EMR = wasted staff time',
+				'Pull System: Make consent form immediately visible (top-level EMR)',
+				'5S Implementation: Organize, standardize, create visual aids',
+				'Kaizen Events: Weekly 15-minute staff huddles to address barriers',
+				'Mistake-Proofing: Add alerts in EMR if consent is missing before provider signs'
+			],
+			outcome: 'Streamlined processes eliminated waste.'
+		},
+		'DMAIC': {
+			title: '📊 DMAIC: Data-Driven Six Sigma',
+			steps: [
+				'Define: Compliance dropped from 97% to 84% in 3 months',
+				'Measure: Baseline = 84%; Target = 95%; Weekly tracking',
+				'Analyze: ' + analyzeText,
+				'Improve: EMR optimization, staff training, new hire onboarding',
+				'Control: Establish control chart; alert on variance >5%',
+				'Sustain: Annual refresher training; quarterly audits'
+			],
+			outcome: 'Data-driven approach identifies drivers.'
+		}
+	};
+
+	var plan = plans[tool] || plans['FOCUS-PDCA'];
+	var html = '<h3>' + plan.title + '</h3><h4>Implementation Steps:</h4><ol>';
+	plan.steps.forEach(function(step) { html += '<li>' + step + '</li>'; });
+	html += '</ol><div class="results-box"><h4>Expected Outcome</h4><p>' + plan.outcome + '</p></div>';
+
+	// Render actions for the chosen tool — HIDE weights in UI
+	var actions = toolActions[tool] || [];
+	var actionsHtml = '<h4>Available Actions (' + actions.length + ')</h4>';
+	actionsHtml += '<p>Select exactly <strong>2</strong> actions to implement. Choosing higher-impact actions improves KPI recovery.</p>';
+	actionsHtml += '<div id="actionsCheckboxes">';
+	actions.forEach(function(a) {
+		// Do not display weight in the label
+		actionsHtml += '<label><input type="checkbox" name="action" value="' + a.id + '"> <strong>' + a.name + '</strong> — ' + a.desc + '</label>';
+	});
+	actionsHtml += '</div>';
+	actionsHtml += '<p class="small">Tip: pick the two actions you can realistically implement quickly and verify.</p>';
+
+	$('#actionPlanContent').html(html + actionsHtml);
+
+	// set actionsMaxPossible for internal normalization
+	var sumMax = 0;
+	actions.forEach(function(a){ sumMax += a.weight; });
+	gameState.actionsMaxPossible = sumMax;
+
+	// Attach selection logic and hint
+	$('#actionsCheckboxes input[name="action"]').off('change').on('change', function() {
+		enforceTwoSelection();
+		updateActionSelectionHint();
+	});
+
+	// initialize
+	updateActionSelectionHint();
+	enforceTwoSelection();
+	$('#executePlanBtn').prop('disabled', true);
+	$('#lockActionsBtn').prop('disabled', true);
+}
+
+// Submit actions selected: require exactly 2 selections
+function submitActions() {
+	var selectedIds = [];
+	$('#actionsCheckboxes input[name="action"]:checked').each(function() {
+		selectedIds.push($(this).val());
+	});
+
+	if (selectedIds.length !== 2) {
+		alert('Please select exactly 2 actions before locking them in.');
+		return;
+	}
+
+	var tool = gameState.tool || 'FOCUS-PDCA';
+	var actions = toolActions[tool] || [];
+
+	var selectedActions = [];
+	var weighted = 0;
+	actions.forEach(function(a) {
+		if (selectedIds.indexOf(a.id) !== -1) {
+			selectedActions.push(a);
+			weighted += a.weight;
+		}
+	});
+
+	gameState.actionsSelected = selectedActions;
+	gameState.actionsWeighted = weighted;
+
+	var actionsFactor = 0.5;
+	if (gameState.actionsMaxPossible > 0) {
+		actionsFactor = 0.5 + (weighted / gameState.actionsMaxPossible) * 0.5;
+	}
+	gameState.actionsFactor = actionsFactor;
+
+	// show locked actions (weights still not shown; show impact label)
+	var lockedHtml = '<div class="results-box"><h4>Locked Actions</h4>';
+	selectedActions.forEach(function(a){
+		lockedHtml += '<div class="cause-block"><strong>' + a.name + '</strong><div>' + a.desc + '</div></div>';
+	});
+	lockedHtml += '<div style="margin-top:10px;"><strong>Estimated Actions Impact:</strong> ' + getImpactLabel(actionsFactor) + '</div>';
+	lockedHtml += '</div>';
+	$('#actionsList').html(lockedHtml);
+
+	// enable Execute Plan button
+	$('#executePlanBtn').prop('disabled', false);
+	// lock UI to prevent changes
+	$('#lockActionsBtn').prop('disabled', true);
+	$('#actionsCheckboxes input').prop('disabled', true);
+	if (currentTimer) clearInterval(currentTimer);
+}
+
+function getImpactLabel(factor) {
+	if (factor >= 0.85) return 'High';
+	if (factor >= 0.65) return 'Moderate';
+	return 'Low';
+}
+
+// Remaining functions unchanged (computeFinalKPI, saveScoreToLeaderboard, renderLeaderboard, etc.)
+
+function computeFinalKPI() {
+	var tool = gameState.tool || 'FOCUS-PDCA';
+	var toolImpact = toolImpacts[tool] !== undefined ? toolImpacts[tool] : 0.75;
+	var dataFactor = 0.5 + ( (gameState.score || 0) / SCORE_MAX ) * 0.5;
+	var actionsFactor = gameState.actionsFactor != null ? gameState.actionsFactor : 0.5;
+	var finalPercent = Math.round(KPI_BASELINE + (KPI_IDEAL - KPI_BASELINE) * toolImpact * dataFactor * actionsFactor);
+	if (finalPercent > KPI_IDEAL) finalPercent = KPI_IDEAL;
+	gameState.finalKPI = finalPercent;
+	return finalPercent;
+}
+
+function saveScoreToLeaderboard(success) {
+	var team = gameState.teamName && gameState.teamName.trim() ? gameState.teamName.trim() : null;
+	if (!team) return;
+	var entry = {
+		teamName: team,
+		normalizedScore: gameState.score || 0,
+		weightedScore: gameState.weightedScore || 0,
+		tool: gameState.tool || 'N/A',
+		actions: (gameState.actionsSelected || []).map(function(a){ return a.name; }),
+		actionsWeighted: gameState.actionsWeighted || 0,
+		finalKPI: gameState.finalKPI != null ? gameState.finalKPI : computeFinalKPI(),
+		success: !!success,
+		timestamp: new Date().toISOString()
+	};
+	try {
+		var key = 'kpiLeaderboard';
+		var data = JSON.parse(localStorage.getItem(key) || '[]');
+		if (data.length > 0) {
+			var last = data[data.length - 1];
+			if (last.teamName === entry.teamName && Math.abs(new Date(last.timestamp) - new Date(entry.timestamp)) < 2000) {
+				// skip duplicate
+			} else {
+				data.push(entry);
+			}
+		} else {
+			data.push(entry);
+		}
+		data.sort(function(a,b){
+			if (b.finalKPI !== a.finalKPI) return b.finalKPI - a.finalKPI;
+			if (b.normalizedScore !== a.normalizedScore) return b.normalizedScore - a.normalizedScore;
+			return b.actionsWeighted - a.actionsWeighted;
+		});
+		data = data.slice(0, 10);
+		localStorage.setItem(key, JSON.stringify(data));
+	} catch (e) {
+		console.error('Could not save leaderboard:', e);
+	}
+}
+
+function renderLeaderboard(containerId) {
+	var key = 'kpiLeaderboard';
+	var data = [];
+	try {
+		data = JSON.parse(localStorage.getItem(key) || '[]');
+	} catch (e) {
+		data = [];
+	}
+	var html = '<h4>Leaderboard — Top Teams</h4>';
+	if (!data || data.length === 0) {
+		html += '<p class="small">No scores yet. Play to add your team.</p>';
+		html += '<div style="margin-top:10px;"><button onclick="clearLeaderboard()">Clear Leaderboard</button></div>';
+	} else {
+		html += '<table><thead><tr><th>#</th><th>Team</th><th>Final KPI</th><th>Score</th><th>Actions</th><th>Tool</th><th class="small">When</th></tr></thead><tbody>';
+		data.forEach(function(row, idx) {
+			var when = new Date(row.timestamp).toLocaleString();
+			html += '<tr>';
+			html += '<td>' + (idx + 1) + '</td>';
+			html += '<td>' + escapeHtml(row.teamName) + '</td>';
+			html += '<td>' + (row.finalKPI != null ? row.finalKPI + '%' : '-') + '</td>';
+			html += '<td>' + row.normalizedScore + ' / ' + SCORE_MAX + '</td>';
+			html += '<td>' + (row.actions && row.actions.length ? escapeHtml(row.actions.join(', ')) : '-') + '</td>';
+			html += '<td>' + (row.tool || 'N/A') + '</td>';
+			html += '<td class="small">' + when + '</td>';
+			html += '</tr>';
+		});
+		html += '</tbody></table>';
+		html += '<div style="margin-top:10px;"><button onclick="clearLeaderboard()">Clear Leaderboard</button></div>';
+	}
+	if (containerId && document.getElementById(containerId)) {
+		document.getElementById(containerId).innerHTML = html;
+	} else {
+		if (document.getElementById('leaderboardContainer')) document.getElementById('leaderboardContainer').innerHTML = html;
+		if (document.getElementById('leaderboardContainerGameOver')) document.getElementById('leaderboardContainerGameOver').innerHTML = html;
+	}
+}
+
+function clearLeaderboard() {
+	if (!confirm('Clear the leaderboard? This cannot be undone.')) return;
+	localStorage.removeItem('kpiLeaderboard');
+	renderLeaderboard();
+}
+
+function escapeHtml(unsafe) {
+	if (!unsafe) return '';
+	return String(unsafe)
+		 .replace(/&/g, "&amp;")
+		 .replace(/</g, "&lt;")
+		 .replace(/>/g, "&gt;")
+		 .replace(/"/g, "&quot;")
+		 .replace(/'/g, "&#039;");
+}
+
+function generateFinalSummary() {
+	var finalPercent = gameState.finalKPI != null ? gameState.finalKPI : computeFinalKPI();
+	var success = finalPercent >= 95;
+	var messageHtml = '';
+	if (success) {
+		messageHtml += '<div class="success-message"><h3>🎉 Mission Accomplished!</h3>';
+		messageHtml += '<p>Your corrective actions restored KPI compliance to <strong>' + finalPercent + '%</strong> — above the 95% target.</p>';
+		messageHtml += '<p>Accreditation is safe. Patient safety is protected. The crisis is resolved.</p></div>';
+	} else {
+		messageHtml += '<div class="failure-message"><h3>⚠️ Partial Improvement</h3>';
+		messageHtml += '<p>Your interventions improved compliance to <strong>' + finalPercent + '%</strong>, but this is below the 95% target.</p>';
+		messageHtml += '<p>Further actions, stronger tool selection, or better data are needed to fully recover.</p></div>';
+	}
+	$('#finalResultMessage').html(messageHtml);
+
+	var html = '<h3>Your Results</h3>';
+	html += '<div class="results-box">';
+	html += '<p><strong>Team Name:</strong> ' + escapeHtml(gameState.teamName || '-') + '</p>';
+	html += '<p><strong>Team Members (' + gameState.teamMembers.length + '):</strong><br>';
+	gameState.teamMembers.forEach(function(member, index) {
+		html += '&nbsp;&nbsp;• ' + escapeHtml(member) + '<br>';
+	});
+	html += '</p>';
+	html += '<p><strong>Final KPI:</strong> ' + finalPercent + '%</p>';
+	html += '<p><strong>Investigation Score (normalized):</strong> ' + gameState.score + ' / ' + SCORE_MAX + '</p>';
+	html += '<p><strong>Weighted Score (raw):</strong> ' + gameState.weightedScore + ' / ' + weightedMaxPossible + '</p>';
+	html += '<p><strong>Root Causes Identified:</strong> ' + (gameState.causes && gameState.causes.length ? escapeHtml(gameState.causes.join(', ')) : '-') + '</p>';
+	html += '<p><strong>Improvement Method:</strong> ' + (gameState.tool || '-') + '</p>';
+	html += '<p><strong>Actions Selected:</strong> ' + (gameState.actionsSelected.length ? escapeHtml(gameState.actionsSelected.map(function(a){return a.name;}).join(', ')) : 'None') + '</p>';
+	html += '<p><strong>Actions Impact:</strong> ' + getImpactLabel(gameState.actionsFactor || 0.5) + '</p>';
+	html += '</div>';
+	html += '<h3>Key Takeaways for Hospital Staff</h3>';
+	html += '<ul>';
+	html += '<li><strong>KPI Management is Critical:</strong> Monitor continuously. Small declines signal problems early.</li>';
+	html += '<li><strong>Root Cause Analysis Matters:</strong> Use data and observation to identify true causes.</li>';
+	html += '<li><strong>Change Management is Essential:</strong> Communicate and train staff on system changes immediately.</li>';
+	html += '<li><strong>Methodology Matters:</strong> Choose the right improvement tool for your situation; FOCUS–PDCA works best in this scenario.</li>';
+	html += '<li><strong>Actions Drive Results:</strong> The specific actions you implement (their quality and completeness) strongly affect KPI recovery.</li>';
+	html += '</ul>';
+	$('#finalSummary').html(html);
+}
+
+function drawKPIChart() {
+	var ctx = document.getElementById('kpiChart');
+	if (!ctx) return;
+	new Chart(ctx, {
+		type: 'line',
+		data: {
+			labels: ['January', 'February', 'March', 'April'],
+			datasets: [{
+				label: 'Consent Documentation %',
+				data: [97, 95, 90, 84],
+				borderColor: '#d63031',
+				backgroundColor: 'rgba(214, 48, 49, 0.1)',
+				fill: true,
+				tension: 0.4,
+				borderWidth: 3,
+				pointRadius: 6,
+				pointBackgroundColor: '#d63031'
+			}]
+		},
+		options: {
+			responsive: true,
+			scales: { y: { min: 80, max: 100, ticks: { callback: function(v) { return v + '%'; } } } }
+		}
+	});
+}
+
+function drawFinalChart() {
+	var ctx = document.getElementById('finalChart');
+	if (!ctx) return;
+	var finalPercent = gameState.finalKPI != null ? gameState.finalKPI : computeFinalKPI();
+	new Chart(ctx, {
+		type: 'line',
+		data: {
+			labels: ['Baseline', 'After Action Plan'],
+			datasets: [{
+				label: 'Consent Documentation %',
+				data: [KPI_BASELINE, finalPercent],
+				borderColor: finalPercent >= 95 ? '#27ae60' : '#f39c12',
+				backgroundColor: finalPercent >= 95 ? 'rgba(39, 174, 96, 0.1)' : 'rgba(243,156,18,0.08)',
+				fill: true,
+				tension: 0.4,
+				borderWidth: 3,
+				pointRadius: 8,
+				pointBackgroundColor: finalPercent >= 95 ? '#27ae60' : '#f39c12'
+			}]
+		},
+		options: {
+			responsive: true,
+			scales: { y: { min: 80, max: 100, ticks: { callback: function(v) { return v + '%'; } } } }
+		}
+	});
+}
+
+function resetGame() {
+	gameState = { 
+		teamName: '',
+		teamMembers: [],
+		score: 0, 
+		weightedScore: 0, 
+		causeWeights: {}, 
+		weightedMax: weightedMaxPossible,
+		tool: null, 
+		actionsSelected: [],
+		actionsWeighted: 0,
+		actionsMaxPossible: 0,
+		actionsFactor: 0.5,
+		finalKPI: null,
+		currentPage: 'Registration' 
+	};
+	goToPage('Registration');
+}
+
+$(document).ready(function() {
+	goToPage('Registration');
+	renderLeaderboard();
+});
+
+/* Leaderboard opener (unchanged) */
+function openLeaderboardWindow() {
+  try {
+    var raw = localStorage.getItem('kpiLeaderboard') || '[]';
+    var b64 = btoa(encodeURIComponent(raw));
+    var url = 'leaderboard.html#lb=' + b64;
+    window.open(url, '_blank', 'noopener');
+  } catch (e) {
+    alert('Could not open leaderboard: ' + e.message);
+  }
+}
+</script>
+
+</body>
+</html>
