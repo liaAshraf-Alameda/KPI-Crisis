@@ -2,64 +2,90 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>KPI Crisis Room: The Missing Consent Forms</title>
+	<title>KPI Crisis Room: The Missing Consent Forms — Neon Edition</title>
+
+	<!-- Fonts -->
+	<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
 	<style>
-		/* Animated gradient background */
+		:root{
+			--bg-dark: #06060a;
+			--panel-bg: rgba(10,10,14,0.6);
+			--glass: rgba(255,255,255,0.03);
+			--neon-cyan: #00fff0;
+			--neon-pink: #ff00d4;
+			--neon-green: #39ff14;
+			--neon-blue: #66f0ff;
+			--neon-yellow: #ffd166;
+			--muted: #cbd5e1;
+			--glow: 0 0 18px rgba(0,255,240,0.18), 0 0 36px rgba(255,0,212,0.08);
+			--card-glow: 0 6px 30px rgba(0,255,240,0.06), inset 0 1px 0 rgba(255,255,255,0.02);
+			--glass-border: rgba(255,255,255,0.06);
+		}
+
+		/* Animated neon background */
 		body {
-			background: linear-gradient(-45deg, #ffcccc, #ffe680, #ccffcc, #cce6ff);
-			background-size: 400% 400%;
-			animation: gradientShift 15s ease infinite;
-			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-			color: #333;
-			padding: 20px;
+			background: radial-gradient(ellipse at 10% 20%, rgba(0,255,240,0.04) 0%, transparent 15%),
+						radial-gradient(ellipse at 90% 80%, rgba(255,0,212,0.035) 0%, transparent 12%),
+						linear-gradient(180deg, var(--bg-dark), #0b0b10 60%);
+			min-height: 100vh;
 			margin: 0;
+			padding: 28px;
+			font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+			color: var(--muted);
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
 		}
 
-		@keyframes gradientShift {
-			0% {background-position: 0% 50%;}
-			50% {background-position: 100% 50%;}
-			100% {background-position: 0% 50%;}
-		}
-
+		/* Container */
 		#story {
-			max-width: 900px;
+			max-width: 980px;
 			margin: 0 auto;
-			background: white;
-			border-radius: 12px;
-			padding: 30px;
-			box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+			background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+			border-radius: 14px;
+			padding: 28px;
+			box-shadow: 0 8px 40px rgba(0,0,0,0.7), var(--card-glow);
+			backdrop-filter: blur(6px) saturate(120%);
+			border: 1px solid var(--glass-border);
+			overflow: hidden;
 		}
 
 		.passage { line-height: 1.8; display: none; }
-		.passage.active { display: block; animation: fadeIn 0.3s ease; }
+		.passage.active { display: block; animation: fadeIn 0.25s ease both; }
 
 		@keyframes fadeIn {
-			from { opacity: 0; }
-			to { opacity: 1; }
+			from { opacity: 0; transform: translateY(6px); }
+			to { opacity: 1; transform: translateY(0); }
 		}
 
 		h1, h2 {
-			color: #d63031;
-			border-bottom: 3px solid #d63031;
-			padding-bottom: 10px;
+			color: var(--neon-pink);
+			font-family: 'Orbitron', sans-serif;
+			letter-spacing: 0.6px;
+			margin: 10px 0 18px 0;
+			text-shadow: 0 0 10px rgba(255,0,212,0.12), 0 0 30px rgba(0,255,240,0.04);
+			border-bottom: 2px dashed rgba(255,255,255,0.02);
+			padding-bottom: 8px;
 		}
 
-		h3 { color: #0984e3; margin-top: 20px; }
+		h3 { color: var(--neon-cyan); margin-top: 18px; font-family: 'Orbitron', sans-serif; }
 
-		/* Team info section */
+		/* Team info panel: neon glass */
 		.team-info {
-			background: linear-gradient(135deg, #667eea, #764ba2);
-			color: white;
-			padding: 20px;
-			border-radius: 8px;
-			margin-bottom: 20px;
+			background: linear-gradient(135deg, rgba(0,0,0,0.45), rgba(255,255,255,0.01));
+			border: 1px solid rgba(0,255,240,0.08);
+			color: var(--neon-cyan);
+			padding: 16px;
+			border-radius: 10px;
+			margin-bottom: 18px;
+			box-shadow: 0 8px 30px rgba(0,0,0,0.6);
 		}
 
 		.team-info h3 {
-			color: white;
+			color: var(--neon-cyan);
 			margin-top: 0;
 			border: none;
 		}
@@ -67,293 +93,288 @@
 		.team-details {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
-			gap: 15px;
-			margin-top: 10px;
+			gap: 12px;
+			margin-top: 8px;
 		}
 
 		.team-detail-item {
-			background: rgba(255,255,255,0.2);
+			background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
 			padding: 10px;
-			border-radius: 6px;
+			border-radius: 8px;
+			border: 1px solid rgba(255,255,255,0.02);
+			box-shadow: 0 4px 18px rgba(0,0,0,0.6);
 		}
 
 		.team-detail-label {
 			font-size: 12px;
-			font-weight: bold;
+			font-weight: 600;
 			text-transform: uppercase;
-			opacity: 0.8;
+			opacity: 0.7;
+			color: rgba(255,255,255,0.6);
 		}
 
 		.team-detail-value {
 			font-size: 18px;
-			font-weight: bold;
-			margin-top: 5px;
+			font-weight: 700;
+			margin-top: 6px;
+			color: var(--neon-yellow);
+			text-shadow: 0 0 8px rgba(255,209,102,0.12);
 		}
 
+		/* Countdown neon */
 		#countdown {
-			font-size: 24px;
-			font-weight: bold;
-			color: #d63031;
-			margin: 15px 0;
-			padding: 15px;
-			background: #fff5f5;
-			border-left: 4px solid #d63031;
-			border-radius: 4px;
+			font-size: 20px;
+			font-weight: 700;
+			color: var(--neon-pink);
+			background: linear-gradient(90deg, rgba(255,0,212,0.03), rgba(0,255,240,0.02));
+			border-left: 4px solid var(--neon-pink);
+			border-radius: 8px;
+			padding: 12px;
 			text-align: center;
+			box-shadow: 0 6px 24px rgba(255,0,212,0.04), 0 0 20px rgba(0,255,240,0.02);
 		}
 
 		#countdown.alarm {
-			animation: alarmPulse 0.5s infinite;
+			animation: alarmPulseNeon 0.6s infinite;
 		}
 
-		@keyframes alarmPulse {
-			0%, 100% { 
-				background: #fff5f5;
-				transform: scale(1);
-			}
-			50% { 
-				background: #ff9999;
-				transform: scale(1.05);
-			}
+		@keyframes alarmPulseNeon {
+			0%,100% { box-shadow: 0 0 8px rgba(255,0,212,0.06), 0 0 28px rgba(255,0,212,0.08); transform: scale(1); }
+			50% { box-shadow: 0 0 20px rgba(255,0,212,0.14), 0 0 48px rgba(255,0,212,0.18); transform: scale(1.02); }
 		}
 
 		.chart-container {
 			position: relative;
 			width: 100%;
-			max-width: 600px;
+			max-width: 680px;
 			margin: 20px auto;
-			background: #f8f9fa;
-			padding: 15px;
-			border-radius: 8px;
+			background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+			padding: 12px;
+			border-radius: 10px;
+			border: 1px solid rgba(0,255,240,0.04);
+			box-shadow: var(--glow);
 		}
 
 		.progress-container {
 			width: 100%;
-			height: 30px;
-			background-color: #e0e0e0;
-			border-radius: 15px;
+			height: 36px;
+			background-color: rgba(255,255,255,0.02);
+			border-radius: 20px;
 			overflow: hidden;
 			margin: 15px 0;
+			border: 1px solid rgba(255,255,255,0.02);
 		}
 
 		.progress-bar {
 			height: 100%;
-			background: linear-gradient(90deg, #00b894, #0984e3);
+			background: linear-gradient(90deg, var(--neon-green), var(--neon-cyan));
 			width: 0%;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			color: white;
-			font-weight: bold;
-			transition: width 0.3s ease;
+			color: #001;
+			font-weight: 800;
+			transition: width 0.35s cubic-bezier(.2,.9,.3,1);
+			text-shadow: 0 0 8px rgba(0,255,240,0.4);
 		}
 
 		form {
 			margin: 20px 0;
-			padding: 15px;
-			background: #f8f9fa;
-			border-radius: 8px;
+			padding: 14px;
+			background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+			border-radius: 10px;
+			border: 1px solid rgba(255,255,255,0.02);
 		}
 
 		label {
 			display: block;
 			margin: 12px 0;
-			padding: 10px;
-			background: white;
-			border: 2px solid #ddd;
-			border-radius: 6px;
+			padding: 12px;
+			background: rgba(0,0,0,0.35);
+			border: 1px solid rgba(255,255,255,0.02);
+			border-radius: 8px;
 			cursor: pointer;
-			transition: all 0.3s ease;
+			transition: all 0.18s ease;
+			color: var(--muted);
 		}
 
 		label:hover {
-			background: #e8f5e9;
-			border-color: #00b894;
+			transform: translateY(-4px);
+			box-shadow: 0 8px 30px rgba(0,0,0,0.6), 0 0 28px rgba(0,255,240,0.06);
+			border-color: rgba(0,255,240,0.12);
+		}
+
+		label input[type="checkbox"], label input[type="radio"] {
+			margin-right: 12px;
+			transform: scale(1.1);
+			filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
 		}
 
 		button {
-			background: linear-gradient(135deg, #667eea, #764ba2);
-			color: white;
-			border: none;
-			padding: 12px 30px;
-			font-size: 16px;
-			border-radius: 6px;
+			background: linear-gradient(135deg, rgba(0,255,240,0.14), rgba(255,0,212,0.12));
+			color: var(--neon-cyan);
+			border: 1px solid rgba(0,255,240,0.12);
+			padding: 10px 18px;
+			font-size: 14px;
+			font-weight: 700;
+			border-radius: 10px;
 			cursor: pointer;
-			margin: 10px 5px;
-			transition: all 0.3s ease;
+			transition: transform 0.14s ease, box-shadow 0.14s ease;
+			text-shadow: 0 0 12px rgba(0,255,240,0.08);
+			box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+			margin: 8px 6px;
 		}
 
 		button:hover:not(:disabled) {
-			transform: translateY(-2px);
-			box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+			transform: translateY(-4px) scale(1.02);
+			box-shadow: 0 10px 36px rgba(0,255,240,0.08), 0 0 28px rgba(255,0,212,0.04);
 		}
 
 		button:disabled {
-			opacity: 0.5;
+			opacity: 0.45;
 			cursor: not-allowed;
+			filter: grayscale(0.35);
 		}
 
 		.results-box {
-			background: #f0f7ff;
-			border-left: 4px solid #0984e3;
+			background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008));
+			border-left: 4px solid rgba(0,255,240,0.08);
 			padding: 15px;
 			margin: 15px 0;
-			border-radius: 4px;
+			border-radius: 8px;
+			color: var(--muted);
 		}
 
 		.cause-block {
 			margin: 10px 0;
 			padding: 12px;
-			border-radius: 6px;
-			background: white;
-			border-left: 4px solid #667eea;
-			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			border-radius: 8px;
+			background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(255,255,255,0.01));
+			border-left: 4px solid rgba(102,126,234,0.06);
+			box-shadow: 0 6px 20px rgba(0,0,0,0.6);
 		}
 
 		.score {
-			font-weight: bold;
+			font-weight: 800;
 			font-size: 18px;
-			color: #d63031;
-			margin-top: 15px;
+			color: var(--neon-pink);
+			margin-top: 12px;
 			padding: 10px;
-			background: #fff5f5;
-			border-radius: 4px;
+			background: rgba(255,0,212,0.03);
+			border-radius: 6px;
+			border: 1px solid rgba(255,0,212,0.06);
+			text-shadow: 0 0 8px rgba(255,0,212,0.06);
 		}
 
 		.tool-card {
-			background: white;
-			border: 2px solid #ddd;
-			padding: 15px;
+			background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+			border: 1px solid rgba(255,255,255,0.02);
+			padding: 12px;
 			margin: 10px 0;
-			border-radius: 8px;
-			transition: all 0.3s ease;
+			border-radius: 10px;
+			transition: all 0.18s ease;
+			box-shadow: 0 8px 24px rgba(0,0,0,0.6);
 		}
 
 		.tool-card:hover {
-			border-color: #667eea;
-			box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+			border-color: rgba(0,255,240,0.12);
+			box-shadow: 0 12px 40px rgba(0,255,240,0.04), 0 8px 24px rgba(0,0,0,0.6);
 		}
 
 		.data-card {
-			background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-			border: 2px solid #667eea;
-			padding: 20px;
+			background: linear-gradient(180deg, rgba(10,10,14,0.72), rgba(255,255,255,0.01));
+			border: 1px solid rgba(0,255,240,0.05);
+			padding: 18px;
 			margin: 15px 0;
-			border-radius: 8px;
-			box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+			border-radius: 10px;
+			box-shadow: 0 10px 36px rgba(0,0,0,0.6);
 		}
 
 		.success-message {
-			background: #d4edda;
-			border: 2px solid #28a745;
-			color: #155724;
-			padding: 15px;
-			border-radius: 6px;
-			margin: 15px 0;
+			background: linear-gradient(90deg, rgba(57,255,20,0.03), rgba(0,255,240,0.01));
+			border: 1px solid rgba(57,255,20,0.08);
+			color: var(--neon-green);
+			padding: 12px;
+			border-radius: 8px;
+			margin: 12px 0;
+			font-weight: 700;
 		}
 
 		.failure-message {
-			background: #fff3cd;
-			border: 2px solid #ffc107;
-			color: #856404;
-			padding: 15px;
-			border-radius: 6px;
-			margin: 15px 0;
+			background: linear-gradient(90deg, rgba(255,201,102,0.02), rgba(255,0,212,0.01));
+			border: 1px solid rgba(255,201,102,0.08);
+			color: var(--neon-yellow);
+			padding: 12px;
+			border-radius: 8px;
+			margin: 12px 0;
+			font-weight: 700;
 		}
 
 		.nav-links {
-			margin-top: 20px;
-			padding-top: 20px;
-			border-top: 2px solid #ddd;
+			margin-top: 18px;
+			padding-top: 18px;
+			border-top: 1px dashed rgba(255,255,255,0.02);
 		}
 
-		.emoji { font-size: 1.5em; margin-right: 8px; }
+		.emoji { font-size: 1.45em; margin-right: 8px; }
 
-		/* Team registration form */
+		/* Registration */
 		.registration-form {
-			background: #f8f9fa;
-			padding: 20px;
-			border-radius: 8px;
-			margin: 20px 0;
+			background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+			padding: 18px;
+			border-radius: 10px;
+			margin: 18px 0;
+			border: 1px solid rgba(255,255,255,0.02);
 		}
 
-		.form-group {
-			margin: 15px 0;
-		}
-
-		.form-group label {
-			display: block;
-			margin-bottom: 8px;
-			font-weight: bold;
-			color: #333;
-			background: none;
-			border: none;
-			padding: 0;
-		}
+		.form-group { margin: 10px 0; }
 
 		.form-group input, .form-group select {
 			width: 100%;
 			padding: 10px;
-			border: 2px solid #ddd;
-			border-radius: 6px;
+			border: 1px solid rgba(255,255,255,0.03);
+			border-radius: 8px;
 			font-size: 14px;
-			box-sizing: border-box;
+			background: rgba(0,0,0,0.45);
+			color: var(--muted);
 		}
 
 		.form-group input:focus, .form-group select:focus {
 			outline: none;
-			border-color: #667eea;
-			background: #f0f7ff;
+			border-color: rgba(0,255,240,0.12);
+			box-shadow: 0 8px 30px rgba(0,255,240,0.04);
+			background: rgba(0,0,0,0.6);
 		}
 
-		.time-info {
-			background: #e3f2fd;
-			border-left: 4px solid #2196F3;
-			padding: 12px;
-			margin: 10px 0;
-			border-radius: 4px;
-			font-size: 14px;
-		}
-
-		/* Team members list */
 		.team-members-list {
-			background: #f0f7ff;
-			border: 2px solid #667eea;
-			padding: 15px;
-			border-radius: 8px;
-			margin: 15px 0;
-		}
-
-		.team-members-list h4 {
-			color: #667eea;
-			margin-top: 0;
+			background: linear-gradient(180deg, rgba(0,0,0,0.36), rgba(255,255,255,0.01));
+			border: 1px solid rgba(0,255,240,0.05);
+			padding: 12px;
+			border-radius: 10px;
+			margin: 12px 0;
+			color: var(--muted);
 		}
 
 		.member-item {
-			background: white;
+			background: rgba(255,255,255,0.01);
 			padding: 10px;
 			margin: 8px 0;
-			border-radius: 4px;
-			border-left: 3px solid #00b894;
+			border-radius: 6px;
+			border-left: 3px solid rgba(57,255,20,0.06);
 		}
 
-		.member-item strong {
-			color: #667eea;
-		}
+		.member-item strong { color: var(--neon-blue); }
 
-		/* Leaderboard */
 		.leaderboard {
 			margin-top: 20px;
-			border: 2px solid #ddd;
+			border: 1px solid rgba(255,255,255,0.02);
 			border-radius: 8px;
 			padding: 12px;
-			background: #fff;
+			background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+			color: var(--muted);
 		}
 
-		.leaderboard h4 {
-			margin: 0 0 10px 0;
-			color: #333;
-		}
+		.leaderboard h4 { margin: 0 0 10px 0; color: var(--neon-cyan); }
 
 		.leaderboard table {
 			width: 100%;
@@ -363,18 +384,15 @@
 		.leaderboard th, .leaderboard td {
 			padding: 8px;
 			text-align: left;
-			border-bottom: 1px solid #eee;
+			border-bottom: 1px solid rgba(255,255,255,0.02);
 			font-size: 13px;
+			color: var(--muted);
 		}
 
-		.leaderboard .small { font-size: 12px; color: #666; }
+		.leaderboard .small { font-size: 12px; color: rgba(255,255,255,0.45); }
 
-		/* Action selection hint */
-		#actionSelectionHint {
-			margin: 10px 0;
-			font-weight: bold;
-			color: #333;
-		}
+		/* small helpers */
+		.small { font-size: 13px; color: rgba(255,255,255,0.6); }
 	</style>
 </head>
 <body>
@@ -1182,9 +1200,9 @@ function updateProgressBar(score, maxScore) {
 	if (bar) {
 		bar.style.width = percent + '%';
 		bar.textContent = Math.round(percent) + '%';
-		if (score < Math.round(maxScore * 0.5)) bar.style.background = 'linear-gradient(90deg, #e74c3c, #c0392b)';
-		else if (score < Math.round(maxScore * 0.85)) bar.style.background = 'linear-gradient(90deg, #f39c12, #e67e22)';
-		else bar.style.background = 'linear-gradient(90deg, #27ae60, #229954)';
+		if (score < Math.round(maxScore * 0.5)) bar.style.background = 'linear-gradient(90deg, #ff004d, #ff7a00)';
+		else if (score < Math.round(maxScore * 0.85)) bar.style.background = 'linear-gradient(90deg, #ffd166, #ff6b6b)';
+		else bar.style.background = 'linear-gradient(90deg, var(--neon-green), var(--neon-cyan))';
 	}
 }
 
@@ -1510,18 +1528,21 @@ function drawKPIChart() {
 			datasets: [{
 				label: 'Consent Documentation %',
 				data: [97, 95, 90, 84],
-				borderColor: '#d63031',
-				backgroundColor: 'rgba(214, 48, 49, 0.1)',
+				borderColor: '#00fff0',
+				backgroundColor: 'rgba(0,255,240,0.06)',
 				fill: true,
 				tension: 0.4,
 				borderWidth: 3,
 				pointRadius: 6,
-				pointBackgroundColor: '#d63031'
+				pointBackgroundColor: '#ff00d4'
 			}]
 		},
 		options: {
 			responsive: true,
-			scales: { y: { min: 80, max: 100, ticks: { callback: function(v) { return v + '%'; } } } }
+			scales: { y: { min: 80, max: 100, ticks: { callback: function(v) { return v + '%'; } } } },
+			plugins: {
+				legend: { labels: { color: '#cbd5e1' } }
+			}
 		}
 	});
 }
@@ -1537,18 +1558,21 @@ function drawFinalChart() {
 			datasets: [{
 				label: 'Consent Documentation %',
 				data: [KPI_BASELINE, finalPercent],
-				borderColor: finalPercent >= 95 ? '#27ae60' : '#f39c12',
-				backgroundColor: finalPercent >= 95 ? 'rgba(39, 174, 96, 0.1)' : 'rgba(243,156,18,0.08)',
+				borderColor: finalPercent >= 95 ? '#39ff14' : '#ffd166',
+				backgroundColor: finalPercent >= 95 ? 'rgba(57,255,20,0.06)' : 'rgba(255,209,102,0.04)',
 				fill: true,
 				tension: 0.4,
 				borderWidth: 3,
 				pointRadius: 8,
-				pointBackgroundColor: finalPercent >= 95 ? '#27ae60' : '#f39c12'
+				pointBackgroundColor: finalPercent >= 95 ? '#39ff14' : '#ffd166'
 			}]
 		},
 		options: {
 			responsive: true,
-			scales: { y: { min: 80, max: 100, ticks: { callback: function(v) { return v + '%'; } } } }
+			scales: { y: { min: 80, max: 100, ticks: { callback: function(v) { return v + '%'; } } } },
+			plugins: {
+				legend: { labels: { color: '#cbd5e1' } }
+			}
 		}
 	});
 }
