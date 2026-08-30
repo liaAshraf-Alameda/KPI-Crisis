@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>KPI Crisis Room: The Missing Consent Forms — Neon Edition</title>
+	<title>KPI Crisis Room: The Missing Consent Forms — Neon Edition (Individual)</title>
 
 	<!-- Fonts -->
 	<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -73,8 +73,8 @@
 
 		h3 { color: var(--neon-cyan); margin-top: 18px; font-family: 'Orbitron', sans-serif; }
 
-		/* Team info panel: neon glass */
-		.team-info {
+		/* Player info panel: neon glass */
+		.player-info {
 			background: linear-gradient(135deg, rgba(0,0,0,0.45), rgba(255,255,255,0.01));
 			border: 1px solid rgba(0,255,240,0.08);
 			color: var(--neon-cyan);
@@ -84,20 +84,20 @@
 			box-shadow: 0 8px 30px rgba(0,0,0,0.6);
 		}
 
-		.team-info h3 {
+		.player-info h3 {
 			color: var(--neon-cyan);
 			margin-top: 0;
 			border: none;
 		}
 
-		.team-details {
+		.player-details {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
 			gap: 12px;
 			margin-top: 8px;
 		}
 
-		.team-detail-item {
+		.player-detail-item {
 			background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
 			padding: 10px;
 			border-radius: 8px;
@@ -105,7 +105,7 @@
 			box-shadow: 0 4px 18px rgba(0,0,0,0.6);
 		}
 
-		.team-detail-label {
+		.player-detail-label {
 			font-size: 12px;
 			font-weight: 600;
 			text-transform: uppercase;
@@ -113,7 +113,7 @@
 			color: rgba(255,255,255,0.6);
 		}
 
-		.team-detail-value {
+		.player-detail-value {
 			font-size: 18px;
 			font-weight: 700;
 			margin-top: 6px;
@@ -346,7 +346,7 @@
 			background: rgba(0,0,0,0.6);
 		}
 
-		.team-members-list {
+		.player-info-list {
 			background: linear-gradient(180deg, rgba(0,0,0,0.36), rgba(255,255,255,0.01));
 			border: 1px solid rgba(0,255,240,0.05);
 			padding: 12px;
@@ -354,16 +354,6 @@
 			margin: 12px 0;
 			color: var(--muted);
 		}
-
-		.member-item {
-			background: rgba(255,255,255,0.01);
-			padding: 10px;
-			margin: 8px 0;
-			border-radius: 6px;
-			border-left: 3px solid rgba(57,255,20,0.06);
-		}
-
-		.member-item strong { color: var(--neon-blue); }
 
 		.leaderboard {
 			margin-top: 20px;
@@ -409,10 +399,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 
 <script>
-// Game state
+// Game state (individual)
 var gameState = {
-	teamName: '',
-	teamMembers: [],
+	playerName: '',
 	score: 0,
 	weightedScore: 0,
 	causeWeights: {},
@@ -482,33 +471,19 @@ var toolActions = {
 	]
 };
 
-// Passages (unchanged except ActionPlan includes hint)
+// Passages (individual wording)
 var passages = {
 	'Registration': `
-		<h2><span class="emoji">👥</span>Team Registration</h2>
-		<p>Welcome to the KPI Crisis Room! Before you begin, please register your team:</p>
+		<h2><span class="emoji">👤</span>Player Registration</h2>
+		<p>Welcome to the KPI Crisis Room! Please enter your name to start:</p>
 		
 		<div class="registration-form">
 			<div class="form-group">
-				<label for="teamName"><strong>Team Name:</strong></label>
-				<input type="text" id="teamName" placeholder="Enter your team name (e.g., Emergency Department, ICU, Compliance Team)" required>
+				<label for="playerName"><strong>Player Name:</strong></label>
+				<input type="text" id="playerName" placeholder="Enter your name (e.g., Alex Johnson)" required>
 			</div>
 
-			<div class="form-group">
-				<label for="memberCount"><strong>Number of Team Members:</strong></label>
-				<select id="memberCount" onchange="updateMemberFields()">
-					<option value="">-- Select number --</option>
-					<option value="1">1 Member</option>
-					<option value="2">2 Members</option>
-					<option value="3">3 Members</option>
-					<option value="4">4 Members</option>
-					<option value="5">5 Members</option>
-				</select>
-			</div>
-
-			<div id="memberFields"></div>
-
-			<button onclick="registerTeam()">Start Mission →</button>
+			<button onclick="registerPlayer()">Start Mission →</button>
 		</div>
 
 		<div class="results-box">
@@ -521,21 +496,19 @@ var passages = {
 		</div>
 	`,
 	'Start': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode">Individual</div>
 				</div>
 			</div>
 		</div>
-
-		<div class="team-members-list" id="teamMembersList"></div>
 
 		<h2><span class="emoji">🚨</span>KPI Crisis Room: The Missing Consent Forms</h2>
 		
@@ -563,20 +536,20 @@ var passages = {
 
 		<div class="nav-links">
 			<button onclick="goToPage('RootCauseHunt')">Yes — Let's Fix This!</button>
-			<button onclick="goToPage('GameOver')">No — We're Not Ready</button>
+			<button onclick="goToPage('GameOver')">No — I'm Not Ready</button>
 		</div>
 	`,
 	'RootCauseHunt': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName2">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName2">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize2">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode2">Individual</div>
 				</div>
 			</div>
 		</div>
@@ -644,16 +617,16 @@ var passages = {
 		</div>
 	`,
 	'DataMarketplace': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName3">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName3">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize3">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode3">Individual</div>
 				</div>
 			</div>
 		</div>
@@ -677,16 +650,16 @@ var passages = {
 		</div>
 	`,
 	'DataAudit': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName4">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName4">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize4">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode4">Individual</div>
 				</div>
 			</div>
 		</div>
@@ -704,16 +677,16 @@ var passages = {
 		</div>
 	`,
 	'DataPhysicians': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName5">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName5">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize5">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode5">Individual</div>
 				</div>
 			</div>
 		</div>
@@ -731,16 +704,16 @@ var passages = {
 		</div>
 	`,
 	'DataEMR': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName6">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName6">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize6">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode6">Individual</div>
 				</div>
 			</div>
 		</div>
@@ -758,16 +731,16 @@ var passages = {
 		</div>
 	`,
 	'DataFeedback': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName7">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName7">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize7">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode7">Individual</div>
 				</div>
 			</div>
 		</div>
@@ -789,16 +762,16 @@ var passages = {
 		</div>
 	`,
 	'ChooseTool': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName8">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName8">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize8">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode8">Individual</div>
 				</div>
 			</div>
 		</div>
@@ -834,16 +807,16 @@ var passages = {
 		</div>
 	`,
 	'ActionPlan': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName9">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName9">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize9">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode9">Individual</div>
 				</div>
 			</div>
 		</div>
@@ -873,16 +846,16 @@ var passages = {
 		</div>
 	`,
 	'FinalRound': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName10">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName10">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize10">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode10">Individual</div>
 				</div>
 			</div>
 		</div>
@@ -906,16 +879,16 @@ var passages = {
 		</div>
 	`,
 	'GameOver': `
-		<div class="team-info">
-			<h3><span class="emoji">👥</span>Team Information</h3>
-			<div class="team-details">
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Name</div>
-					<div class="team-detail-value" id="displayTeamName11">-</div>
+		<div class="player-info">
+			<h3><span class="emoji">👤</span>Player Information</h3>
+			<div class="player-details">
+				<div class="player-detail-item">
+					<div class="player-detail-label">Player</div>
+					<div class="player-detail-value" id="displayPlayerName11">-</div>
 				</div>
-				<div class="team-detail-item">
-					<div class="team-detail-label">Team Size</div>
-					<div class="team-detail-value" id="displayTeamSize11">-</div>
+				<div class="player-detail-item">
+					<div class="player-detail-label">Mode</div>
+					<div class="player-detail-value" id="displayPlayerMode11">Individual</div>
 				</div>
 			</div>
 		</div>
@@ -938,50 +911,16 @@ var passages = {
 	`
 };
 
-// Update member fields dynamically
-function updateMemberFields() {
-	var count = $('#memberCount').val();
-	var html = '';
+// Register player
+function registerPlayer() {
+	var playerName = $('#playerName').val().trim();
 
-	if (count) {
-		html += '<h4>Team Members:</h4>';
-		for (var i = 1; i <= count; i++) {
-			html += '<div class="form-group">';
-			html += '<label for="member' + i + '"><strong>Member ' + i + ' Name:</strong></label>';
-			html += '<input type="text" id="member' + i + '" placeholder="Enter member name" required>';
-			html += '</div>';
-		}
-	}
-
-	$('#memberFields').html(html);
-}
-
-// Register team
-function registerTeam() {
-	var teamName = $('#teamName').val().trim();
-	var memberCount = $('#memberCount').val();
-
-	if (!teamName) {
-		alert('Please enter your team name');
-		return;
-	}
-	if (!memberCount) {
-		alert('Please select number of team members');
+	if (!playerName) {
+		alert('Please enter your name');
 		return;
 	}
 
-	gameState.teamName = teamName;
-	gameState.teamMembers = [];
-
-	for (var i = 1; i <= memberCount; i++) {
-		var memberName = $('#member' + i).val().trim();
-		if (!memberName) {
-			alert('Please enter name for Member ' + i);
-			return;
-		}
-		gameState.teamMembers.push(memberName);
-	}
-
+	gameState.playerName = playerName;
 	goToPage('Start');
 }
 
@@ -990,628 +929,263 @@ function goToPage(pageName) {
 	gameState.currentPage = pageName;
 	$('#story').html('<div class="passage active">' + passages[pageName] + '</div>');
 
-	// Update team info displays
-	$('#displayTeamName, #displayTeamName2, #displayTeamName3, #displayTeamName4, #displayTeamName5, #displayTeamName6, #displayTeamName7, #displayTeamName8, #displayTeamName9, #displayTeamName10, #displayTeamName11').text(gameState.teamName);
-	$('#displayTeamSize, #displayTeamSize2, #displayTeamSize3, #displayTeamSize4, #displayTeamSize5, #displayTeamSize6, #displayTeamSize7, #displayTeamSize8, #displayTeamSize9, #displayTeamSize10, #displayTeamSize11').text(gameState.teamMembers.length + ' members');
+	// Update player info displays (all displayPlayerNameN and displayPlayerModeN)
+	$('[id^="displayPlayerName"]').text(gameState.playerName || '-');
+	$('[id^="displayPlayerMode"]').text('Individual');
 
-	// Display team members list on Start page
+	// Special page behaviors
 	if (pageName === 'Start') {
-		var membersList = '<h4>Team Members:</h4>';
-		gameState.teamMembers.forEach(function(member, index) {
-			membersList += '<div class="member-item"><strong>Member ' + (index + 1) + ':</strong> ' + member + '</div>';
-		});
-		$('#teamMembersList').html(membersList);
-		
-		setTimeout(drawKPIChart, 300);
-	} else if (pageName === 'RootCauseHunt') {
-		startCountdown(timeLimits.RootCauseHunt, function() {
-			saveScoreToLeaderboard(false);
-			goToPage('GameOver');
-		});
-	} else if (pageName === 'DataMarketplace') {
-		setTimeout(function() {
-			updateDataMarketplace();
-			startCountdown(timeLimits.DataMarketplace, function() {
-				alert('Time expired! Moving to Tool Selection.');
-				goToPage('ChooseTool');
-			});
-		}, 300);
-	} else if (pageName === 'ActionPlan') {
-		setTimeout(function() {
-			generateActionPlan();
-			startCountdown(timeLimits.ActionPlan, function() {
-				goToPage('FinalRound');
-			});
-		}, 200);
-	} else if (pageName === 'FinalRound') {
-		computeFinalKPI();
-		setTimeout(drawFinalChart, 300);
-		generateFinalSummary();
-		saveScoreToLeaderboard(gameState.finalKPI >= 95);
-		renderLeaderboard('leaderboardContainer');
-	} else if (pageName === 'GameOver') {
-		renderLeaderboard('leaderboardContainerGameOver');
+		renderKpiChart();
+	}
+	if (pageName === 'RootCauseHunt') {
+		startCountdown('RootCauseHunt');
+	}
+	if (pageName === 'DataMarketplace') {
+		renderProgressBar();
+		startCountdown('DataMarketplace');
+		renderDataLinks();
+	}
+	if (pageName === 'ChooseTool') {
+		// nothing special yet
+	}
+	if (pageName === 'ActionPlan') {
+		startCountdown('ActionPlan');
+		renderActionPlan();
+	}
+	if (pageName === 'FinalRound') {
+		renderFinalResults();
+	}
+	if (pageName === 'GameOver') {
+		// show leaderboard in game over if needed
 	}
 }
 
-// Countdown timer
-var currentTimer = null;
-function startCountdown(duration, onExpire) {
-	if (currentTimer) clearInterval(currentTimer);
-
-	var timeLeft = duration;
-	var countdownEl = document.getElementById('countdown');
-	if (!countdownEl) return;
-
-	currentTimer = setInterval(function() {
-		var minutes = Math.floor(timeLeft / 60);
-		var seconds = timeLeft % 60;
-		var padSeconds = seconds < 10 ? '0' + seconds : seconds;
-		countdownEl.textContent = '⏳ Time remaining: ' + minutes + 'm ' + padSeconds + 's';
-
-		if (timeLeft <= 10 && timeLeft > 0) {
-			countdownEl.classList.add('alarm');
-			playAlarmSound();
+// Countdown timer (simple, shared)
+var countdownTimer = null;
+var countdownRemaining = 0;
+function startCountdown(section) {
+	clearInterval(countdownTimer);
+	countdownRemaining = timeLimits[section] || 300;
+	$('#countdown').text(formatTime(countdownRemaining));
+	countdownTimer = setInterval(function() {
+		countdownRemaining--;
+		$('#countdown').text(formatTime(countdownRemaining));
+		if (countdownRemaining <= 10) {
+			$('#countdown').addClass('alarm');
+			document.getElementById('alarmSound').play();
 		} else {
-			countdownEl.classList.remove('alarm');
+			$('#countdown').removeClass('alarm');
 		}
-
-		timeLeft--;
-		if (timeLeft < 0) {
-			clearInterval(currentTimer);
-			countdownEl.classList.remove('alarm');
-			if (onExpire) onExpire();
+		if (countdownRemaining <= 0) {
+			clearInterval(countdownTimer);
+			goToPage('GameOver');
 		}
 	}, 1000);
 }
-
-function playAlarmSound() {
-	try {
-		var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-		var oscillator = audioContext.createOscillator();
-		var gainNode = audioContext.createGain();
-
-		oscillator.connect(gainNode);
-		gainNode.connect(audioContext.destination);
-
-		oscillator.frequency.value = 800;
-		oscillator.type = 'sine';
-
-		gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-		gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-
-		oscillator.start(audioContext.currentTime);
-		oscillator.stop(audioContext.currentTime + 0.1);
-	} catch(e) {
-		var audio = document.getElementById('alarmSound');
-		if (audio) audio.play().catch(function() {});
-	}
+function formatTime(s) {
+	var m = Math.floor(s/60);
+	var sec = s % 60;
+	return (m>0?m+':':'') + (sec<10? '0'+sec : sec);
 }
 
-// Submit causes (unchanged)
+// Submit causes
 function submitCauses() {
 	var selected = [];
-	$('#causeForm input[name="cause"]:checked').each(function() {
+	$('#causeForm input[name="cause"]:checked').each(function(){
 		selected.push($(this).val());
 	});
-
 	if (selected.length !== 3) {
-		alert('Please select exactly 3 causes before continuing.');
+		alert('Please select exactly 3 causes.');
 		return;
 	}
-
-	var weightedScore = 0;
-	var causeWeights = {};
-	var totalWeight = 0;
-	selected.forEach(function(choice) {
-		var w = weightRatings[choice] || 0;
-		causeWeights[choice] = w;
-		weightedScore += w;
-		totalWeight += w;
+	gameState.actionsSelected = [];
+	// calculate a simple score based on weights
+	var score = 0;
+	selected.forEach(function(v){
+		score += (weightRatings[v] || 0);
 	});
-
-	var normalizedScore = 0;
-	if (weightedMaxPossible > 0) {
-		normalizedScore = Math.round((weightedScore / weightedMaxPossible) * SCORE_MAX);
-	} else {
-		normalizedScore = 0;
-	}
-
-	gameState.score = normalizedScore;
-	gameState.weightedScore = weightedScore;
-	gameState.weightedMax = weightedMaxPossible;
-	gameState.causes = selected;
-	gameState.causeWeights = causeWeights;
-
-	var causeData = {
-		'Staff shortage': 'Observed: High ratio of open shifts; multiple appointments rescheduled.',
-		'New physicians joined': 'Observed: New hires unfamiliar with local workflows; higher error rates during onboarding.',
-		'Consent form moved in EMR': 'Observed: Consent workflow changed location in the EMR; staff report difficulty finding the form.',
-		'Staff not trained': 'Observed: Missing training logs; staff report uncertainty on procedures.',
-		'Medication shortage': 'Observed: Pharmacy alerts for low stock; substitution rates increased.',
-		'Equipment malfunction': 'Observed: Increased maintenance tickets; several downtime incidents.',
-		'Poor supervision': 'Observed: Inconsistent oversight and documentation checks.',
-		'Policy update not communicated': 'Observed: Policy changes not communicated to frontline staff.',
-		'High patient turnover': 'Observed: Busy shifts reduce time available for documentation.',
-		'Overloaded EMR system': 'Observed: EMR performance issues during peak hours.',
-		'Language barriers with patients': 'Observed: Interpreters needed frequently; process delays occur.'
-	};
-
-	var resultsHtml = '<h3>Your Selections</h3>';
-	selected.forEach(function(choice) {
-		resultsHtml += '<div class="cause-block"><strong>' + choice + '</strong><div>' + causeData[choice] + '</div>';
-		resultsHtml += '<div style="margin-top:8px;"><em>Weight:</em> ' + (causeWeights[choice] || 0) + ' pts';
-		if (totalWeight > 0) {
-			var pct = Math.round((causeWeights[choice] / totalWeight) * 100);
-			resultsHtml += ' &nbsp;(<strong>' + pct + '%</strong> of selected impact)';
-		}
-		resultsHtml += '</div></div>';
-	});
-
-	resultsHtml += '<div class="score">Score: ' + normalizedScore + ' / ' + SCORE_MAX + ' (weighted: ' + weightedScore + ' / ' + weightedMaxPossible + ')</div>';
-
-	$('#results').html(resultsHtml).show();
+	gameState.score = score;
+	$('#results').show().html('<div class="success-message">Investigation complete — score: ' + score + '</div>');
 	$('#continueBtn').show();
-	$('#causeForm').prop('disabled', true);
-	
-	if (currentTimer) clearInterval(currentTimer);
 }
 
-// Tool selection (unchanged)
+// Render Data Links (based on score)
+function renderDataLinks() {
+	var score = gameState.score || 0;
+	var links = '';
+	links += '<div class="tool-card"><strong>Audit Results</strong><br><button onclick="goToPage(\\'DataAudit\\')">Open Report</button></div>';
+	if (score >= 20) {
+		links += '<div class="tool-card"><strong>Physician Profiles</strong><br><button onclick="goToPage(\\'DataPhysicians\\')">Open Report</button></div>';
+	}
+	if (score >= 15) {
+		links += '<div class="tool-card"><strong>EMR Change Log</strong><br><button onclick="goToPage(\\'DataEMR\\')">Open Report</button></div>';
+	}
+	links += '<div class="tool-card"><strong>Staff Feedback</strong><br><button onclick="goToPage(\\'DataFeedback\\')">Open Report</button></div>';
+	$('#dataLinks').html(links);
+	$('#scoreDisplay').text('Investigation Score: ' + (gameState.score || 0));
+	// update progress bar
+	var pct = Math.min(100, Math.round((gameState.score / (weightedMaxPossible || 1)) * 100));
+	$('#progressBar').css('width', pct + '%').text(pct + '%');
+}
+
+// Render KPI chart on Start
+function renderKpiChart() {
+	var ctx = document.getElementById('kpiChart');
+	if (!ctx) return;
+	var chart = new Chart(ctx, {
+		type: 'line',
+		data: {
+			labels: ['4 months ago','3 months ago','2 months ago','Now'],
+			datasets: [{
+				label: 'Consent Documentation %',
+				data: [97,95,90,84],
+				borderColor: 'rgba(102,240,255,0.9)',
+				backgroundColor: 'rgba(0,255,240,0.06)',
+				fill: true,
+				tension: 0.2
+			}]
+		},
+		options: {
+			scales: {
+				y: { min: 70, max: 100 }
+			}
+		}
+	});
+}
+
+// Submit tool selection
 function submitTool() {
-	var selected = $('#toolForm input[name="tool"]:checked').val();
+	var selected = $('input[name="tool"]:checked').val();
 	if (!selected) {
-		alert('Please choose a tool before continuing.');
+		alert('Please select an improvement tool.');
 		return;
 	}
 	gameState.tool = selected;
 	$('#toolContinueBtn').show();
-	if (currentTimer) clearInterval(currentTimer);
+	alert('Tool locked: ' + selected);
 }
 
-// Data Marketplace update (unchanged)
-function updateDataMarketplace() {
-	var scoreDisplay = '<div class="results-box"><h3>Your Investigation Score: ' + gameState.score + ' / ' + SCORE_MAX + '</h3>';
-	scoreDisplay += '<p><small>Weighted score: ' + (gameState.weightedScore || 0) + ' / ' + weightedMaxPossible + '</small></p>';
-	if (gameState.score >= SCORE_MAX) scoreDisplay += '<p>🏆 Excellent investigation! All premium data unlocked.</p>';
-	else if (gameState.score >= Math.round(SCORE_MAX * 0.6)) scoreDisplay += '<p>✅ Good investigation. Most data available.</p>';
-	else scoreDisplay += '<p>⚠️ Limited data available.</p>';
-	scoreDisplay += '</div>';
-	$('#scoreDisplay').html(scoreDisplay);
-
-	var dataLinks = '<p>Click to view detailed analysis reports:</p>';
-	if (gameState.score >= 10) dataLinks += '<button onclick="goToPage(\'DataAudit\')">📊 Audit Results</button>';
-	else dataLinks += '<p><em>Locked: Score 10+ to unlock</em></p>';
-	if (gameState.score >= 15) dataLinks += '<button onclick="goToPage(\'DataPhysicians\')">👩‍⚕️ Physician Profile</button>';
-	else dataLinks += '<p><em>Locked: Score 15+ to unlock</em></p>';
-	if (gameState.score >= 20) dataLinks += '<button onclick="goToPage(\'DataEMR\')">💻 EMR Change Report</button>';
-	else dataLinks += '<p><em>Locked: Score 20+ to unlock</em></p>';
-	if (gameState.score >= 25) dataLinks += '<button onclick="goToPage(\'DataFeedback\')">🗣️ Staff Feedback</button>';
-	else dataLinks += '<p><em>Locked: Score 25+ to unlock</em></p>';
-	$('#dataLinks').html(dataLinks);
-
-	updateProgressBar(gameState.score, SCORE_MAX);
-}
-
-// Progress bar (unchanged)
-function updateProgressBar(score, maxScore) {
-	var percent = Math.min((score / maxScore) * 100, 100);
-	var bar = document.getElementById('progressBar');
-	if (bar) {
-		bar.style.width = percent + '%';
-		bar.textContent = Math.round(percent) + '%';
-		if (score < Math.round(maxScore * 0.5)) bar.style.background = 'linear-gradient(90deg, #ff004d, #ff7a00)';
-		else if (score < Math.round(maxScore * 0.85)) bar.style.background = 'linear-gradient(90deg, #ffd166, #ff6b6b)';
-		else bar.style.background = 'linear-gradient(90deg, var(--neon-green), var(--neon-cyan))';
-	}
-}
-
-// NEW: enforce two-selection helpers
-function enforceTwoSelection() {
-	var checked = $('#actionsCheckboxes input[name="action"]:checked');
-	var all = $('#actionsCheckboxes input[name="action"]');
-	if (checked.length >= 2) {
-		all.not(':checked').prop('disabled', true);
-		$('#lockActionsBtn').prop('disabled', false);
-	} else {
-		all.prop('disabled', false);
-		$('#lockActionsBtn').prop('disabled', true);
-	}
-}
-
-function updateActionSelectionHint() {
-	var count = $('#actionsCheckboxes input[name="action"]:checked').length;
-	$('#actionSelectionHint').text('Selected ' + count + ' of 2 actions' + (count === 2 ? ' — ready to lock' : ''));
-}
-
-// Action plan generation: hide weights in UI and attach selection logic
-function generateActionPlan() {
+// Render action plan options based on tool
+function renderActionPlan() {
 	var tool = gameState.tool || 'FOCUS-PDCA';
-	var contributions = [];
-	var totalSelectedWeight = 0;
-	for (var c in gameState.causeWeights) totalSelectedWeight += gameState.causeWeights[c] || 0;
-	for (var c in gameState.causeWeights) {
-		var w = gameState.causeWeights[c] || 0;
-		var pct = totalSelectedWeight > 0 ? Math.round((w / totalSelectedWeight) * 100) : 0;
-		contributions.push({ cause: c, weight: w, pct: pct });
-	}
-	contributions.sort(function(a,b){return b.weight - a.weight;});
-	var analyzeText = 'Root cause contributions (selected causes): ';
-	analyzeText += contributions.map(function(x){ return x.cause + ' ' + x.pct + '%'; }).join(' • ');
-
-	var plans = {
-		'FOCUS-PDCA': {
-			title: '🔄 Rapid Cycle Improvement (FOCUS-PDCA)',
-			steps: [
-				'Find: Confirm EMR form location is the main barrier',
-				'Organize: Assemble team (IT, clinical staff, compliance)',
-				'Clarify: Root cause = EMR change without communication',
-				'Understand: 16% documentation gap linked to new form location',
-				'Select: Quick wins: Create job aid, add EMR quick link, email staff',
-				'Plan-Do-Check-Act: PDCA Cycle 1: Create quick reference card, distribute, monitor, adjust'
-			],
-			outcome: 'Rapid implementation with weekly monitoring.'
-		},
-		'Lean': {
-			title: '⚡ Lean Process Optimization',
-			steps: [
-				'Value Stream Map: Current consent documentation workflow',
-				'Identify Waste: Consent form hidden in EMR = wasted staff time',
-				'Pull System: Make consent form immediately visible (top-level EMR)',
-				'5S Implementation: Organize, standardize, create visual aids',
-				'Kaizen Events: Weekly 15-minute staff huddles to address barriers',
-				'Mistake-Proofing: Add alerts in EMR if consent is missing before provider signs'
-			],
-			outcome: 'Streamlined processes eliminated waste.'
-		},
-		'DMAIC': {
-			title: '📊 DMAIC: Data-Driven Six Sigma',
-			steps: [
-				'Define: Compliance dropped from 97% to 84% in 3 months',
-				'Measure: Baseline = 84%; Target = 95%; Weekly tracking',
-				'Analyze: ' + analyzeText,
-				'Improve: EMR optimization, staff training, new hire onboarding',
-				'Control: Establish control chart; alert on variance >5%',
-				'Sustain: Annual refresher training; quarterly audits'
-			],
-			outcome: 'Data-driven approach identifies drivers.'
-		}
-	};
-
-	var plan = plans[tool] || plans['FOCUS-PDCA'];
-	var html = '<h3>' + plan.title + '</h3><h4>Implementation Steps:</h4><ol>';
-	plan.steps.forEach(function(step) { html += '<li>' + step + '</li>'; });
-	html += '</ol><div class="results-box"><h4>Expected Outcome</h4><p>' + plan.outcome + '</p></div>';
-
-	// Render actions for the chosen tool — HIDE weights in UI
 	var actions = toolActions[tool] || [];
-	var actionsHtml = '<h4>Available Actions (' + actions.length + ')</h4>';
-	actionsHtml += '<p>Select exactly <strong>2</strong> actions to implement. Choosing higher-impact actions improves KPI recovery.</p>';
-	actionsHtml += '<div id="actionsCheckboxes">';
-	actions.forEach(function(a) {
-		// Do not display weight in the label
-		actionsHtml += '<label><input type="checkbox" name="action" value="' + a.id + '"> <strong>' + a.name + '</strong> — ' + a.desc + '</label>';
+	var html = '';
+	actions.forEach(function(a){
+		html += '<label><input type="checkbox" name="action" value="'+a.id+'" data-weight="'+a.weight+'"><strong>'+a.name+'</strong><div class="small">'+a.desc+'</div></label>';
 	});
-	actionsHtml += '</div>';
-	actionsHtml += '<p class="small">Tip: pick the two actions you can realistically implement quickly and verify.</p>';
+	$('#actionsList').html(html);
 
-	$('#actionPlanContent').html(html + actionsHtml);
-
-	// set actionsMaxPossible for internal normalization
-	var sumMax = 0;
-	actions.forEach(function(a){ sumMax += a.weight; });
-	gameState.actionsMaxPossible = sumMax;
-
-	// Attach selection logic and hint
-	$('#actionsCheckboxes input[name="action"]').off('change').on('change', function() {
-		enforceTwoSelection();
-		updateActionSelectionHint();
+	// Wire up selection limit
+	$('#actionsList input[name="action"]').on('change', function(){
+		var checked = $('#actionsList input[name="action"]:checked').length;
+		$('#actionSelectionHint').text('Selected ' + checked + ' of 2 actions');
+		if (checked === 2) {
+			$('#lockActionsBtn').prop('disabled', false);
+		} else {
+			$('#lockActionsBtn').prop('disabled', true);
+			$('#executePlanBtn').prop('disabled', true);
+		}
 	});
-
-	// initialize
-	updateActionSelectionHint();
-	enforceTwoSelection();
-	$('#executePlanBtn').prop('disabled', true);
-	$('#lockActionsBtn').prop('disabled', true);
 }
 
-// Submit actions selected: require exactly 2 selections
 function submitActions() {
-	var selectedIds = [];
-	$('#actionsCheckboxes input[name="action"]:checked').each(function() {
-		selectedIds.push($(this).val());
-	});
-
-	if (selectedIds.length !== 2) {
-		alert('Please select exactly 2 actions before locking them in.');
+	var checked = $('#actionsList input[name="action"]:checked');
+	if (checked.length !== 2) {
+		alert('Please select exactly 2 actions.');
 		return;
 	}
-
-	var tool = gameState.tool || 'FOCUS-PDCA';
-	var actions = toolActions[tool] || [];
-
-	var selectedActions = [];
-	var weighted = 0;
-	actions.forEach(function(a) {
-		if (selectedIds.indexOf(a.id) !== -1) {
-			selectedActions.push(a);
-			weighted += a.weight;
-		}
+	gameState.actionsSelected = [];
+	var totalWeight = 0;
+	checked.each(function(){
+		gameState.actionsSelected.push($(this).val());
+		totalWeight += parseInt($(this).data('weight') || 0, 10);
 	});
-
-	gameState.actionsSelected = selectedActions;
-	gameState.actionsWeighted = weighted;
-
-	var actionsFactor = 0.5;
-	if (gameState.actionsMaxPossible > 0) {
-		actionsFactor = 0.5 + (weighted / gameState.actionsMaxPossible) * 0.5;
-	}
-	gameState.actionsFactor = actionsFactor;
-
-	// show locked actions (weights still not shown; show impact label)
-	var lockedHtml = '<div class="results-box"><h4>Locked Actions</h4>';
-	selectedActions.forEach(function(a){
-		lockedHtml += '<div class="cause-block"><strong>' + a.name + '</strong><div>' + a.desc + '</div></div>';
-	});
-	lockedHtml += '<div style="margin-top:10px;"><strong>Estimated Actions Impact:</strong> ' + getImpactLabel(actionsFactor) + '</div>';
-	lockedHtml += '</div>';
-	$('#actionsList').html(lockedHtml);
-
-	// enable Execute Plan button
-	$('#executePlanBtn').prop('disabled', false);
-	// lock UI to prevent changes
+	gameState.actionsWeighted = totalWeight;
 	$('#lockActionsBtn').prop('disabled', true);
-	$('#actionsCheckboxes input').prop('disabled', true);
-	if (currentTimer) clearInterval(currentTimer);
+	$('#executePlanBtn').prop('disabled', false);
+	alert('Actions locked.');
 }
 
-function getImpactLabel(factor) {
-	if (factor >= 0.85) return 'High';
-	if (factor >= 0.65) return 'Moderate';
-	return 'Low';
-}
+// Render final results
+function renderFinalResults() {
+	// simple model: final KPI = baseline + toolImpact*(actionsWeighted / maxPossible)*10
+	var toolImpact = toolImpacts[gameState.tool] || 0.8;
+	var maxActionWeight = 18; // approximate maximum two-action sum
+	var actionFactor = (gameState.actionsWeighted || 0) / (maxActionWeight || 1);
+	var improvement = Math.round(toolImpact * actionFactor * 12); // scale
+	var finalKPI = Math.min(100, KPI_BASELINE + improvement);
+	gameState.finalKPI = finalKPI;
 
-// Remaining functions unchanged (computeFinalKPI, saveScoreToLeaderboard, renderLeaderboard, etc.)
-
-function computeFinalKPI() {
-	var tool = gameState.tool || 'FOCUS-PDCA';
-	var toolImpact = toolImpacts[tool] !== undefined ? toolImpacts[tool] : 0.75;
-	var dataFactor = 0.5 + ( (gameState.score || 0) / SCORE_MAX ) * 0.5;
-	var actionsFactor = gameState.actionsFactor != null ? gameState.actionsFactor : 0.5;
-	var finalPercent = Math.round(KPI_BASELINE + (KPI_IDEAL - KPI_BASELINE) * toolImpact * dataFactor * actionsFactor);
-	if (finalPercent > KPI_IDEAL) finalPercent = KPI_IDEAL;
-	gameState.finalKPI = finalPercent;
-	return finalPercent;
-}
-
-function saveScoreToLeaderboard(success) {
-	var team = gameState.teamName && gameState.teamName.trim() ? gameState.teamName.trim() : null;
-	if (!team) return;
-	var entry = {
-		teamName: team,
-		normalizedScore: gameState.score || 0,
-		weightedScore: gameState.weightedScore || 0,
-		tool: gameState.tool || 'N/A',
-		actions: (gameState.actionsSelected || []).map(function(a){ return a.name; }),
-		actionsWeighted: gameState.actionsWeighted || 0,
-		finalKPI: gameState.finalKPI != null ? gameState.finalKPI : computeFinalKPI(),
-		success: !!success,
-		timestamp: new Date().toISOString()
-	};
-	try {
-		var key = 'kpiLeaderboard';
-		var data = JSON.parse(localStorage.getItem(key) || '[]');
-		if (data.length > 0) {
-			var last = data[data.length - 1];
-			if (last.teamName === entry.teamName && Math.abs(new Date(last.timestamp) - new Date(entry.timestamp)) < 2000) {
-				// skip duplicate
-			} else {
-				data.push(entry);
-			}
-		} else {
-			data.push(entry);
-		}
-		data.sort(function(a,b){
-			if (b.finalKPI !== a.finalKPI) return b.finalKPI - a.finalKPI;
-			if (b.normalizedScore !== a.normalizedScore) return b.normalizedScore - a.normalizedScore;
-			return b.actionsWeighted - a.actionsWeighted;
-		});
-		data = data.slice(0, 10);
-		localStorage.setItem(key, JSON.stringify(data));
-	} catch (e) {
-		console.error('Could not save leaderboard:', e);
-	}
-}
-
-function renderLeaderboard(containerId) {
-	var key = 'kpiLeaderboard';
-	var data = [];
-	try {
-		data = JSON.parse(localStorage.getItem(key) || '[]');
-	} catch (e) {
-		data = [];
-	}
-	var html = '<h4>Leaderboard — Top Teams</h4>';
-	if (!data || data.length === 0) {
-		html += '<p class="small">No scores yet. Play to add your team.</p>';
-		html += '<div style="margin-top:10px;"><button onclick="clearLeaderboard()">Clear Leaderboard</button></div>';
-	} else {
-		html += '<table><thead><tr><th>#</th><th>Team</th><th>Final KPI</th><th>Score</th><th>Actions</th><th>Tool</th><th class="small">When</th></tr></thead><tbody>';
-		data.forEach(function(row, idx) {
-			var when = new Date(row.timestamp).toLocaleString();
-			html += '<tr>';
-			html += '<td>' + (idx + 1) + '</td>';
-			html += '<td>' + escapeHtml(row.teamName) + '</td>';
-			html += '<td>' + (row.finalKPI != null ? row.finalKPI + '%' : '-') + '</td>';
-			html += '<td>' + row.normalizedScore + ' / ' + SCORE_MAX + '</td>';
-			html += '<td>' + (row.actions && row.actions.length ? escapeHtml(row.actions.join(', ')) : '-') + '</td>';
-			html += '<td>' + (row.tool || 'N/A') + '</td>';
-			html += '<td class="small">' + when + '</td>';
-			html += '</tr>';
-		});
-		html += '</tbody></table>';
-		html += '<div style="margin-top:10px;"><button onclick="clearLeaderboard()">Clear Leaderboard</button></div>';
-	}
-	if (containerId && document.getElementById(containerId)) {
-		document.getElementById(containerId).innerHTML = html;
-	} else {
-		if (document.getElementById('leaderboardContainer')) document.getElementById('leaderboardContainer').innerHTML = html;
-		if (document.getElementById('leaderboardContainerGameOver')) document.getElementById('leaderboardContainerGameOver').innerHTML = html;
-	}
-}
-
-function clearLeaderboard() {
-	if (!confirm('Clear the leaderboard? This cannot be undone.')) return;
-	localStorage.removeItem('kpiLeaderboard');
-	renderLeaderboard();
-}
-
-function escapeHtml(unsafe) {
-	if (!unsafe) return '';
-	return String(unsafe)
-		 .replace(/&/g, "&amp;")
-		 .replace(/</g, "&lt;")
-		 .replace(/>/g, "&gt;")
-		 .replace(/"/g, "&quot;")
-		 .replace(/'/g, "&#039;");
-}
-
-function generateFinalSummary() {
-	var finalPercent = gameState.finalKPI != null ? gameState.finalKPI : computeFinalKPI();
-	var success = finalPercent >= 95;
-	var messageHtml = '';
-	if (success) {
-		messageHtml += '<div class="success-message"><h3>🎉 Mission Accomplished!</h3>';
-		messageHtml += '<p>Your corrective actions restored KPI compliance to <strong>' + finalPercent + '%</strong> — above the 95% target.</p>';
-		messageHtml += '<p>Accreditation is safe. Patient safety is protected. The crisis is resolved.</p></div>';
-	} else {
-		messageHtml += '<div class="failure-message"><h3>⚠️ Partial Improvement</h3>';
-		messageHtml += '<p>Your interventions improved compliance to <strong>' + finalPercent + '%</strong>, but this is below the 95% target.</p>';
-		messageHtml += '<p>Further actions, stronger tool selection, or better data are needed to fully recover.</p></div>';
-	}
-	$('#finalResultMessage').html(messageHtml);
-
-	var html = '<h3>Your Results</h3>';
-	html += '<div class="results-box">';
-	html += '<p><strong>Team Name:</strong> ' + escapeHtml(gameState.teamName || '-') + '</p>';
-	html += '<p><strong>Team Members (' + gameState.teamMembers.length + '):</strong><br>';
-	gameState.teamMembers.forEach(function(member, index) {
-		html += '&nbsp;&nbsp;• ' + escapeHtml(member) + '<br>';
-	});
-	html += '</p>';
-	html += '<p><strong>Final KPI:</strong> ' + finalPercent + '%</p>';
-	html += '<p><strong>Investigation Score (normalized):</strong> ' + gameState.score + ' / ' + SCORE_MAX + '</p>';
-	html += '<p><strong>Weighted Score (raw):</strong> ' + gameState.weightedScore + ' / ' + weightedMaxPossible + '</p>';
-	html += '<p><strong>Root Causes Identified:</strong> ' + (gameState.causes && gameState.causes.length ? escapeHtml(gameState.causes.join(', ')) : '-') + '</p>';
-	html += '<p><strong>Improvement Method:</strong> ' + (gameState.tool || '-') + '</p>';
-	html += '<p><strong>Actions Selected:</strong> ' + (gameState.actionsSelected.length ? escapeHtml(gameState.actionsSelected.map(function(a){return a.name;}).join(', ')) : 'None') + '</p>';
-	html += '<p><strong>Actions Impact:</strong> ' + getImpactLabel(gameState.actionsFactor || 0.5) + '</p>';
-	html += '</div>';
-	html += '<h3>Key Takeaways for Hospital Staff</h3>';
-	html += '<ul>';
-	html += '<li><strong>KPI Management is Critical:</strong> Monitor continuously. Small declines signal problems early.</li>';
-	html += '<li><strong>Root Cause Analysis Matters:</strong> Use data and observation to identify true causes.</li>';
-	html += '<li><strong>Change Management is Essential:</strong> Communicate and train staff on system changes immediately.</li>';
-	html += '<li><strong>Methodology Matters:</strong> Choose the right improvement tool for your situation; FOCUS–PDCA works best in this scenario.</li>';
-	html += '<li><strong>Actions Drive Results:</strong> The specific actions you implement (their quality and completeness) strongly affect KPI recovery.</li>';
-	html += '</ul>';
-	$('#finalSummary').html(html);
-}
-
-function drawKPIChart() {
-	var ctx = document.getElementById('kpiChart');
-	if (!ctx) return;
-	new Chart(ctx, {
-		type: 'line',
-		data: {
-			labels: ['January', 'February', 'March', 'April'],
-			datasets: [{
-				label: 'Consent Documentation %',
-				data: [97, 95, 90, 84],
-				borderColor: '#00fff0',
-				backgroundColor: 'rgba(0,255,240,0.06)',
-				fill: true,
-				tension: 0.4,
-				borderWidth: 3,
-				pointRadius: 6,
-				pointBackgroundColor: '#ff00d4'
-			}]
-		},
-		options: {
-			responsive: true,
-			scales: { y: { min: 80, max: 100, ticks: { callback: function(v) { return v + '%'; } } } },
-			plugins: {
-				legend: { labels: { color: '#cbd5e1' } }
-			}
-		}
-	});
-}
-
-function drawFinalChart() {
+	// show chart
 	var ctx = document.getElementById('finalChart');
-	if (!ctx) return;
-	var finalPercent = gameState.finalKPI != null ? gameState.finalKPI : computeFinalKPI();
-	new Chart(ctx, {
-		type: 'line',
-		data: {
-			labels: ['Baseline', 'After Action Plan'],
-			datasets: [{
-				label: 'Consent Documentation %',
-				data: [KPI_BASELINE, finalPercent],
-				borderColor: finalPercent >= 95 ? '#39ff14' : '#ffd166',
-				backgroundColor: finalPercent >= 95 ? 'rgba(57,255,20,0.06)' : 'rgba(255,209,102,0.04)',
-				fill: true,
-				tension: 0.4,
-				borderWidth: 3,
-				pointRadius: 8,
-				pointBackgroundColor: finalPercent >= 95 ? '#39ff14' : '#ffd166'
-			}]
-		},
-		options: {
-			responsive: true,
-			scales: { y: { min: 80, max: 100, ticks: { callback: function(v) { return v + '%'; } } } },
-			plugins: {
-				legend: { labels: { color: '#cbd5e1' } }
+	if (ctx) {
+		var chart = new Chart(ctx, {
+			type: 'bar',
+			data: {
+				labels: ['Baseline','Post-Intervention'],
+				datasets: [{
+					label: 'Consent Documentation %',
+					data: [KPI_BASELINE, finalKPI],
+					backgroundColor: ['rgba(255,99,132,0.2)','rgba(75,192,192,0.6)'],
+					borderColor: ['rgba(255,99,132,0.8)','rgba(75,192,192,0.9)']
+				}]
+			},
+			options: {
+				scales: { y: { min: 70, max: 100 } }
 			}
-		}
-	});
+		});
+	}
+
+	var msg = '';
+	if (finalKPI >= 95) {
+		msg = '<div class="success-message">Success — KPI recovered to ' + finalKPI + '%. Accreditation at lower risk.</div>';
+	} else {
+		msg = '<div class="failure-message">Partial recovery — KPI improved to ' + finalKPI + '%. More work needed.</div>';
+	}
+	$('#finalResultMessage').html(msg);
+
+	// summary
+	var summary = '<h3>Summary</h3>';
+	summary += '<p><strong>Player:</strong> ' + (gameState.playerName || '-') + '</p>';
+	summary += '<p><strong>Tool used:</strong> ' + (gameState.tool || '-') + '</p>';
+	summary += '<p><strong>Actions implemented:</strong> ' + (gameState.actionsSelected.join(', ') || '-') + '</p>';
+	summary += '<p><strong>Final KPI:</strong> ' + finalKPI + '%</p>';
+	$('#finalSummary').html(summary);
+
+	// small leaderboard stub
+	$('#leaderboardContainer').html('<h4>Leaderboard (solo)</h4><table><tr><th>Player</th><th>KPI</th></tr><tr><td>' + (gameState.playerName || '-') + '</td><td>' + finalKPI + '%</td></tr></table>');
+}
+
+// helpers
+function renderProgressBar() {
+	var pct = Math.min(100, Math.round((gameState.score / (weightedMaxPossible || 1)) * 100));
+	$('#progressBar').css('width', pct + '%').text(pct + '%');
 }
 
 function resetGame() {
-	gameState = { 
-		teamName: '',
-		teamMembers: [],
-		score: 0, 
-		weightedScore: 0, 
-		causeWeights: {}, 
-		weightedMax: weightedMaxPossible,
-		tool: null, 
+	// reset minimal state and go back to registration
+	gameState = {
+		playerName: '',
+		score: 0,
+		weightedScore: 0,
+		causeWeights: {},
+		weightedMax: 0,
+		tool: null,
 		actionsSelected: [],
 		actionsWeighted: 0,
 		actionsMaxPossible: 0,
 		actionsFactor: 0.5,
 		finalKPI: null,
-		currentPage: 'Registration' 
+		currentPage: 'Registration'
 	};
+	clearInterval(countdownTimer);
 	goToPage('Registration');
 }
 
-$(document).ready(function() {
+// Initialize on load
+$(function(){
 	goToPage('Registration');
-	renderLeaderboard();
 });
-
-/* Leaderboard opener (unchanged) */
-function openLeaderboardWindow() {
-  try {
-    var raw = localStorage.getItem('kpiLeaderboard') || '[]';
-    var b64 = btoa(encodeURIComponent(raw));
-    var url = 'leaderboard.html#lb=' + b64;
-    window.open(url, '_blank', 'noopener');
-  } catch (e) {
-    alert('Could not open leaderboard: ' + e.message);
-  }
-}
 </script>
 
 </body>
